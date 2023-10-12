@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "Consoleneingabe": {
+      "commandName": "Project",
+      "commandLineArgs": ""
+    },
+    "Mode 1": {
+      "commandName": "Project",
+      "commandLineArgs": "/mode 1 /p1 23"
+    }
+
+  }
+}
