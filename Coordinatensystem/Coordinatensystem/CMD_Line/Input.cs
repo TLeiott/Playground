@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Coordinatensystem.CMD_Line
 {
@@ -29,7 +30,16 @@ namespace Coordinatensystem.CMD_Line
 
                 Console.SetCursorPosition(0, size + 2);
                 string input = Console.ReadLine();
-                if (input == "") { input = latest[0]; } else if (latest[0] != "" && input != "C" && input != "c" && input != "z" && input != "Z" && input != "r" && input != "R") { latest[0] = input; }
+                if (input == "") { input = latest[0]; } else if (latest[0] != "" && input != "Clear" && input != "clear" && input != "z" && input != "Z" && input != "r" && input != "R") { latest[0] = input; }
+                
+                //Try Smart
+                if (input[0] == 'y' && input[1] == '=')
+                {
+                    CMD_Line.Smart.AutoDraw(input,size,mainList,lastList);
+                    input = "";
+                }
+
+                //input
                 switch (input)
                 {
                     case "h":
@@ -39,8 +49,8 @@ namespace Coordinatensystem.CMD_Line
                     case "p":
                     case "P"://Parabel
                         CMD_Line.Parabel.DisplayParabel(mainList, size, latest, lastList); break;
-                    case "c":
-                    case "C"://Clear
+                    case "clear":
+                    case "Clear"://Clear
                         mainList = UI.Coordinate_System.ClearList(mainList, size); messageOverwrite = true; break;
                     case "v":
                     case "V"://Vector
@@ -57,12 +67,17 @@ namespace Coordinatensystem.CMD_Line
                         run = false;
                         break;
                     case "s":
-                    case "S":
+                    case "S"://sinus
                         CMD_Line.Sinus.DisplaySinus(mainList, size, latest, lastList);
                         break;
+                    case "c":
+                    case "C"://Kreis
+                        CMD_Line.Circle.DisplayCircle(mainList, size, latest, lastList);
+                        break;
                     case "z":
-                    case "Z":
-                        //DeleteLast(mainList, lastList);
+                    case "Z"://undo
+                        CMD_Line.UnDo.UnDoLast(mainList, lastList);
+                        UI.Coordinate_System.Background(size);
                         UI.Coordinate_System.Render(mainList, size);
                         break;
                     default:
@@ -79,7 +94,7 @@ namespace Coordinatensystem.CMD_Line
             Console.SetCursorPosition(0, size + 1);
 
             //skip messagefield
-            if (!messageOverwrite) { Console.WriteLine(string.Empty.PadLeft(150, ' ')); } else { Console.WriteLine(""); }
+            if (!messageOverwrite) { Console.WriteLine(string.Empty.PadLeft(250, ' ')); } else { Console.WriteLine(""); }
 
             Console.WriteLine(string.Empty.PadLeft(150, ' '));
             Console.SetCursorPosition(0, size + 1);

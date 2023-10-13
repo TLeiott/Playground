@@ -11,7 +11,7 @@ namespace Coordinatensystem.UI
         public static bool DisplayHelpInformation(int size)
         {
             Console.SetCursorPosition(0, size + 1);
-            Formating.ConsoleWriter.LineColor("Help: (h/H=Help,p/P=Parabel,v/V=Vector,q/Q=Quit) Please write ONE Command:", ConsoleColor.Green);
+            Formating.ConsoleWriter.LineColor("Help: (h/H=Help, p/P=Parabel, v/V=Vector, s/S=SinusCurve, c/C=Cirlce, z/Z=Undo the last Step, q/Q=Quit,clear/Clear=clear the field, noInput=repeat last input step by step, y= ... Smart AutoDraw [BETA]) Please write ONE Command:", ConsoleColor.Green);
             return true;
         }
     }
