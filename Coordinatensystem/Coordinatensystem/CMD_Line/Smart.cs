@@ -127,13 +127,18 @@ namespace Coordinatensystem.CMD_Line
                 double y = double.Parse((string)row["input"]) - 1;
                 float finalX = x - 1;
                 lastY = y;
+                CMD_Line.Input.ClearInputField(size);
                 if (y < size && y >= 0)
                 {
+                    Console.SetCursorPosition(0, size + 1);
+                    string display = input.Substring(2, input.Length - 2);
+                    display=display.Replace("y",Convert.ToString(Math.Floor(y)));
+                    Formating.ConsoleWriter.Color($"{Math.Floor(y)} = {display.Replace("x",Convert.ToString(Math.Floor(x)))}           ", ConsoleColor.DarkCyan);
                     if (!mainList.Contains((Convert.ToInt32(Math.Round(finalX)), (int)y)))
                     {
                         mainList.Add((Convert.ToInt32(Math.Round(finalX)), (int)(y)));
                         lastList.Add((Convert.ToInt32(Math.Round(finalX)), (int)(y)));
-                        UI.Coordinate_System.RenderSingle(Convert.ToInt32(Math.Round(finalX)), (int)y, size, ConsoleColor.Cyan);
+                        UI.Coordinate_System.RenderSingle(Convert.ToInt32(Math.Round(finalX)), (int)y, size, ConsoleColor.DarkCyan);
                     }
                 }
                 CMD_Line.Input.ClearInputField(size);

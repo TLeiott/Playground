@@ -76,7 +76,7 @@ namespace Coordinatensystem.CMD_Line
                     {
                         mainList.Add((Convert.ToInt32(Math.Round(x)), (int)y));
                         lastList.Add((Convert.ToInt32(Math.Round(x)), (int)y));
-                        UI.Coordinate_System.RenderSingle(Convert.ToInt32(Math.Round(x)), (int)y, size, ConsoleColor.Blue);
+                        UI.Coordinate_System.RenderSingle(Convert.ToInt32(Math.Round(x)), (int)y, size, ConsoleColor.DarkGreen);
                     }
                 }
                 y = (int)(-Math.Sqrt(Math.Pow(r, 2) - Math.Pow(x - positionX + 1, 2)) + positionY);
@@ -86,7 +86,7 @@ namespace Coordinatensystem.CMD_Line
                     {
                         mainList.Add((Convert.ToInt32(Math.Round(x)), (int)y));
                         lastList.Add((Convert.ToInt32(Math.Round(x)), (int)y));
-                        UI.Coordinate_System.RenderSingle(Convert.ToInt32(Math.Round(x)), (int)y, size, ConsoleColor.Blue);
+                        UI.Coordinate_System.RenderSingle(Convert.ToInt32(Math.Round(x)), (int)y, size, ConsoleColor.DarkGreen);
                     }
                 }
             }

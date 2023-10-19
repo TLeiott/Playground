@@ -85,11 +85,12 @@ namespace Coordinatensystem.CMD_Line
             }
 
             //erstellen der Sinsukurve
+            CMD_Line.Input.ClearInputField(size);
             for (float x = 0; x < size * 3 - 1; x += (1f / size / 2))
             {
                 int y = (int)(stretchY * Math.Sin(stretchX * x + positionX - 1) + positionY - 1);
-                CMD_Line.Input.ClearInputField(size);
-                Formating.ConsoleWriter.Color($"Sinus: [ {y} = {stretchY} *sin({stretchX}* {x} + {positionX}) + {positionY}", ConsoleColor.Blue);
+                Console.SetCursorPosition(0, size + 1);
+                Formating.ConsoleWriter.Color($"Sinus: [ {y} = {stretchY} *sin({stretchX}* {x} + {positionX}) + {positionY}]           ", ConsoleColor.Blue);
                 if (y < size && y >= 0)
                 {
                     if (!mainList.Contains((Convert.ToInt32(Math.Round(x)), (int)y)))

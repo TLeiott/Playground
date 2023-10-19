@@ -78,6 +78,10 @@ namespace Coordinatensystem.CMD_Line
                     case "Save"://Save to File
                         CMD_Line.SaveAsFile.Save(mainList);
                         break;
+                    case "load":
+                    case "Load"://Load from File
+                        mainList=CMD_Line.SaveAsFile.Load(mainList);
+                        UI.Coordinate_System.Render(mainList, size); break;
                     case "z":
                     case "Z"://undo
                         CMD_Line.UnDo.UnDoLast(mainList, lastList);
