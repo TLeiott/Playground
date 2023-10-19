@@ -70,6 +70,10 @@ namespace Coordinatensystem.CMD_Line
                     case "S"://sinus
                         CMD_Line.Sinus.DisplaySinus(mainList, size, latest, lastList);
                         break;
+                    case "random":
+                    case "Random"://random
+                        CMD_Line.RandomPlace.DisplayRandom(mainList, size, latest, lastList);
+                        break;
                     case "c":
                     case "C"://Kreis
                         CMD_Line.Circle.DisplayCircle(mainList, size, latest, lastList);
