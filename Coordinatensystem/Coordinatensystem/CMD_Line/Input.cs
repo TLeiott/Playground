@@ -74,6 +74,10 @@ namespace Coordinatensystem.CMD_Line
                     case "C"://Kreis
                         CMD_Line.Circle.DisplayCircle(mainList, size, latest, lastList);
                         break;
+                    case "save":
+                    case "Save"://Save to File
+                        CMD_Line.SaveAsFile.Save(mainList);
+                        break;
                     case "z":
                     case "Z"://undo
                         CMD_Line.UnDo.UnDoLast(mainList, lastList);

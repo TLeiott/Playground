@@ -1,13 +1,5 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Globalization;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Coordinatensystem
 {
@@ -54,7 +46,7 @@ namespace Coordinatensystem
         {
             //Window Resize
             int windowHeight = 3;
-            int windowWidth = 70;
+            int windowWidth = 110;
             string[] latest = new string[10];
             bool run = true;
             bool messageOverwrite = false;
@@ -97,6 +89,7 @@ namespace Coordinatensystem
             Console.Read();
 
         }
+
         /*  Hilfe von Ronny 
         static void DoIt()
         {

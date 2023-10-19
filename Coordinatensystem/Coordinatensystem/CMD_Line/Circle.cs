@@ -23,22 +23,22 @@ namespace Coordinatensystem.CMD_Line
             Formating.ConsoleWriter.Color("[y = Sqrt(r²-(x-", ConsoleColor.DarkGreen);//y = Sqrt(r²-(x-a)²)+b
             Formating.ConsoleWriter.Color("a", ConsoleColor.Magenta);
             Formating.ConsoleWriter.Color(")²)+b]", ConsoleColor.DarkGreen);
-            Formating.ConsoleWriter.LineColor($" Bitte gieb die X-Coordinate des Kreises ein(0-{size}):");
+            Formating.ConsoleWriter.LineColor($" Bitte gieb die X-Coordinate des Kreises ein(0-{size*3}):");
             while (true)
             {
                 string input = Console.ReadLine();
                 if (input == "") { input = latest[1]; } else if (latest[1] != "") { latest[1] = input; }
-                if (int.TryParse(input, out positionX) && positionX <= size) { break; }
+                if (int.TryParse(input, out positionX) && positionX <= size*3) { break; }
                 CMD_Line.Input.ClearInputField(size);
-                Formating.ConsoleWriter.LineColor($"Fehler! Bitte gieb eine Positive Ganzzahl bis {size} ein:", ConsoleColor.Red);
+                Formating.ConsoleWriter.LineColor($"Fehler! Bitte gieb eine Positive Ganzzahl bis {size*3} ein:", ConsoleColor.Red);
             }
 
             //Y Coordinate-Input
             CMD_Line.Input.ClearInputField(size);
             Formating.ConsoleWriter.Color("Sinus: ");
-            Formating.ConsoleWriter.Color($"[y = Sqrt(r²-(x-{positionX})²)+", ConsoleColor.Blue);//y = Sqrt(r²-(x-a)²)+b
+            Formating.ConsoleWriter.Color($"[y = Sqrt(r²-(x-{positionX})²)+", ConsoleColor.DarkGreen);//y = Sqrt(r²-(x-a)²)+b
             Formating.ConsoleWriter.Color("b", ConsoleColor.Magenta);
-            Formating.ConsoleWriter.Color("]", ConsoleColor.Blue);
+            Formating.ConsoleWriter.Color("]", ConsoleColor.DarkGreen);
             Formating.ConsoleWriter.LineColor($" Bitte gieb die Y-Coordinate des Kreises ein(0-{size}):");
             while (true)
             {
