@@ -1,39 +1,73 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Serientermine.Input;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System;
+using System.Text.Json;
+using System.Collections.Generic;
 
 namespace Serientermine
 {
     internal class Program
     {
+        public class SeriesItem
+        {
+            public string Name { get; set; }
+            public string Type { get; set; }
+            public int IntervallNummer { get; set; }
+            public string Begin { get; set; }
+            public string End { get; set; }
+            public string Wochentage { get; set; }
+        }
+
+        public class RootObject
+        {
+            public List<SeriesItem> Series { get; set; }
+        }
         static void Main(string[] args)
         {
             var host = Host.CreateDefaultBuilder(args).Build();
+            string fileContents = "";
 
             try
             {
                 host.Start();
-                //var series = GetSeriesFromConfiguration(host);
-
-
-                var dateFrom = new DateTime(2023, 1, 1);
-                var dateTo = new DateTime(2023, 12, 31);
-
-                List<Input.Serie> serien = new List<Input.Serie>();
-                serien.Add(new Serie { ID = 1, StartDatum = DateTime.Parse("01.01.2022"), EndDatum = DateTime.Parse("01.01.2023"), Wochentage= new List<int> {1,2,3,4,5,6,7} });
+                string filePath = @"D:\Github\PlayGround\Serientermine\Serientermine\appsettings.json";
+                try
+                {// Read the contents of the file into a string
+                    fileContents = File.ReadAllText(filePath);
+                    // Now, the file contents are stored in the "fileContents" variable as a string
+                    Console.WriteLine(fileContents);
+                }
+                catch (Exception e)
+                { Console.WriteLine($"An error occurred: {e.Message}"); }
 
 
             }
             finally
             {
                 host.StopAsync().Wait();
+            }
+            RootObject root = JsonSerializer.Deserialize<RootObject>(fileContents);
+
+            if (root != null)
+            {
+                foreach (var seriesItem in root.Series)
+                {
+                    Console.WriteLine($"Name: {seriesItem.Name}");
+                    Console.WriteLine($"Type: {seriesItem.Type}");
+                    Console.WriteLine($"IntervallNummer: {seriesItem.IntervallNummer}");
+                    Console.WriteLine($"Begin: {seriesItem.Begin}");
+                    Console.WriteLine($"End: {seriesItem.End}");
+                    Console.WriteLine($"Wochentage: {seriesItem.Wochentage}");
+                    Console.WriteLine();
+                }
             }
         }
         //private static List<Serientermin.ITerminSerie> GetSeriesFromConfiguration(IHost host)
