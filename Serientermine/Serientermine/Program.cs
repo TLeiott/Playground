@@ -1,36 +1,81 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System;
 using System.Text.Json;
-using System.Collections.Generic;
+using System.Text.Json.Serialization;
+using System.Threading;
 
 namespace Serientermine
 {
     internal class Program
     {
-        public class SeriesItem
-        {
-            public string Name { get; set; }
-            public string Type { get; set; }
-            public int IntervallNummer { get; set; }
-            public string Begin { get; set; }
-            public string End { get; set; }
-            public string Wochentage { get; set; }
-        }
 
         public class RootObject
         {
-            public List<SeriesItem> Series { get; set; }
+            public List<Serie.Serie> Series { get; set; }
+        }
+
+        // Create a custom converter for DateTime
+        class DateTimeConverter : JsonConverter<DateTime>
+        {
+            public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                string dateStr = reader.GetString();
+                return DateTime.ParseExact(dateStr, "dd.MM.yyyy", null);
+            }
+
+            public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+            {
+                writer.WriteStringValue(value.ToString("dd.MM.yyyy"));
+            }
         }
         static void Main(string[] args)
+        {
+            string fileContents = File.ReadAllText(@"D:\Github\PlayGround\Serientermine\Serientermine\appsettings.json");
+
+            // Register the custom converter
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true, // to handle lowercase property names
+            };
+            options.Converters.Add(new DateTimeConverter());
+
+            // Parse the JSON into a list of Serie objects
+            var series = JsonSerializer.Deserialize<RootObject>(fileContents, options).Series;
+
+            // Create a list to store Serie.Serie objects
+            List<Serie.Serie> serieList = new List<Serie.Serie>();
+
+
+            // Iterate through the parsed Serie objects and create Serie.Serie instances
+            foreach (var serie in series)
+            {
+                string name = serie.Name;
+                string type = serie.Type;
+                int intervallNummer = serie.IntervallNummer;
+                DateTime begin = serie.Begin;
+                DateTime end = serie.End;
+                string wochentage = serie.Wochentage;
+
+                // Create a new Serie.Serie instance and add it to the list
+                Serie.Serie newSerie = new Serie.Serie(name, type, intervallNummer, begin, end, wochentage);
+                serieList.Add(newSerie);
+            }
+            // Now you have a list of Serie.Serie objects
+            foreach (var serie in serieList)
+            {
+                Console.WriteLine($"Name: {serie.Name}");
+                Console.WriteLine($"Type: {serie.Type}");
+                Console.WriteLine($"IntervallNummer: {serie.IntervallNummer}");
+                Console.WriteLine($"Begin: {serie.Begin}");
+                Console.WriteLine($"End: {serie.End}");
+                Console.WriteLine($"Wochentage: {serie.Wochentage}");
+                Console.WriteLine();
+            }
+
+        }
+        static void MainOFF(string[] args)
         {
             var host = Host.CreateDefaultBuilder(args).Build();
             string fileContents = "";
@@ -41,9 +86,35 @@ namespace Serientermine
                 string filePath = @"D:\Github\PlayGround\Serientermine\Serientermine\appsettings.json";
                 try
                 {// Read the contents of the file into a string
-                    fileContents = File.ReadAllText(filePath);
-                    // Now, the file contents are stored in the "fileContents" variable as a string
-                    Console.WriteLine(fileContents);
+                    fileContents = File.ReadAllText(filePath); Serie.Serie a = new Serie.Serie("Meine Serie", "TypA", 1, DateTime.Now, DateTime.Now.AddDays(7), "Montag");
+                    List<Serie.Serie> serieList = new List<Serie.Serie>();
+                    RootObject root = JsonSerializer.Deserialize<RootObject>(fileContents);
+                    if (root != null)
+                    {
+                        foreach (var seriesItem in root.Series)
+                        {
+                            string name = seriesItem.Name;
+                            string type = seriesItem.Type;
+                            int intervallNummer = seriesItem.IntervallNummer;
+                            DateTime begin = Convert.ToDateTime(seriesItem.Begin);
+                            DateTime end = seriesItem.End;
+                            string wochentage = seriesItem.Wochentage;
+
+                            // Erstelle eine Instanz der Serie-Klasse und füge sie zur Liste hinzu
+                            Serie.Serie newSerie = new Serie.Serie(name, type, intervallNummer, begin, end, wochentage);
+                            serieList.Add(newSerie);
+                        }
+                        foreach (var seriesItem in root.Series)
+                        {
+                            Console.WriteLine(seriesItem.Name);
+                            Console.WriteLine(seriesItem.Type);
+                            Console.WriteLine(seriesItem.IntervallNummer);
+                            Console.WriteLine(Convert.ToString(seriesItem.Begin));
+                            Console.WriteLine(Convert.ToString(seriesItem.End));
+                            Console.WriteLine(seriesItem.Wochentage);
+                            Console.WriteLine();
+                        }
+                    }
                 }
                 catch (Exception e)
                 { Console.WriteLine($"An error occurred: {e.Message}"); }
@@ -53,21 +124,6 @@ namespace Serientermine
             finally
             {
                 host.StopAsync().Wait();
-            }
-            RootObject root = JsonSerializer.Deserialize<RootObject>(fileContents);
-
-            if (root != null)
-            {
-                foreach (var seriesItem in root.Series)
-                {
-                    Console.WriteLine($"Name: {seriesItem.Name}");
-                    Console.WriteLine($"Type: {seriesItem.Type}");
-                    Console.WriteLine($"IntervallNummer: {seriesItem.IntervallNummer}");
-                    Console.WriteLine($"Begin: {seriesItem.Begin}");
-                    Console.WriteLine($"End: {seriesItem.End}");
-                    Console.WriteLine($"Wochentage: {seriesItem.Wochentage}");
-                    Console.WriteLine();
-                }
             }
         }
         //private static List<Serientermin.ITerminSerie> GetSeriesFromConfiguration(IHost host)
