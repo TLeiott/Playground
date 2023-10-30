@@ -10,12 +10,14 @@ namespace Serientermine
 {
     internal class Program
     {
-
+        // NOTE: Gewöhne Dir an, für jede Klasse eine eigene Datei zu erstellen
+        // -> Cursor auf die Klasse RootObject und über Alt-Enter sollte Visual Studio Hilfsmethoden anbeiten
         public class RootObject
         {
             public List<Serie.Serie> Series { get; set; }
         }
 
+        // NOTE: Dito ...
         // Create a custom converter for DateTime
         class DateTimeConverter : JsonConverter<DateTime>
         {
@@ -30,9 +32,28 @@ namespace Serientermine
                 writer.WriteStringValue(value.ToString("dd.MM.yyyy"));
             }
         }
+
         static void Main(string[] args)
         {
+            /*
+             * NOTE: Die appsettings.json wurde nicht korrekt eingelesen, da die Property "Copy to Output Directory" nicht auf "Always" gesetzt wurde.
+             * Somit wird diese nicht in das Verzeichnis "bin\Debug" kopiert und kann somit auch nicht eingelesen werden.
+             *
+             * Grundsätzlich ist es zu vermeiden, dass Pfade im Programm hart codiert werden. Die Pfade gelten in der Regel immer nur auf einem
+             * Rechner und machen nur Probleme. Es sollte - auch bei Testprogrammen - andere Wege gefunden werden, wie Konfigurationsdateien, Startparameter, etc.
+             * Aus Bequemlichkeitsgründen kann man das in Testprogrammen durchaus so lösen. Dann sollten diese aber auch immer in der Program.cs zu finden sein.
+             * Alles andere ist im Fehlerfall nicht offensichtlich und schwierig zu finden.
+             */
             string fileContents = File.ReadAllText(@"D:\Github\PlayGround\Serientermine\Serientermine\appsettings.json");
+
+            // NOTE: Alternative Möglichkeit wie man sowas hart codiert lösen kann:
+            //var settingsPath = Environment.MachineName.ToUpperInvariant() switch
+            //{
+            //    "RGLASS" => "D:\\Github\\Tim\\Playground\\Serientermine\\Serientermine\\appsettings.json",
+            //    "LEIOTT" => @"D:\Github\PlayGround\Serientermine\Serientermine\appsettings.json",
+            //    _ => throw new NotSupportedException("Für den Rechner muss der Pfad zur appsettings.json in Main() hinterlegt werden.")   // Fail fast
+            //};
+            //var fileContents = File.ReadAllText(settingsPath);
 
             // Register the custom converter
             var options = new JsonSerializerOptions
@@ -77,6 +98,7 @@ namespace Serientermine
         }
         static void MainOFF(string[] args)
         {
+            // NOTE: Das Einlesen der appsettings.json sollte nun funktionieren
             var host = Host.CreateDefaultBuilder(args).Build();
             string fileContents = "";
 
