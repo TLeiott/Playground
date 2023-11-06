@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Serientermine.Serie
+namespace Serientermine.Serientermine
 {
     internal class Serie
     {
@@ -12,10 +12,10 @@ namespace Serientermine.Serie
         public string Type { get; set; }
         public int IntervallNummer { get; set; }
         public DateTime Begin { get; set; }
-        public DateTime End { get; set; }
+        public DateTime? End { get; set; }
         public string Wochentage { get; set; }
-        public List<DateTime> dateTimes { get; set; }
-        public Serie(string name, string type, int intervallNummer, DateTime begin, DateTime end, string wochentage)
+
+        public Serie(string name, string type, int intervallNummer, DateTime begin, DateTime? end, string wochentage)
         {
             Name = name;
             Type = type;
