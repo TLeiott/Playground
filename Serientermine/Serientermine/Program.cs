@@ -10,9 +10,10 @@ namespace Serientermine
     internal class Program
     {
         private static IHost HostInstance;
-
+        
         static void Main(string[] args)
         {
+            Console.CursorVisible = false;
             // NOTE: Das Einlesen der appsettings.json sollte nun funktionieren
             var host = Host.CreateDefaultBuilder(args).Build();
             DateTime maxEnd= new DateTime(2099,12,31);

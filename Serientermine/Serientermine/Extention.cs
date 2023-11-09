@@ -25,7 +25,7 @@ namespace Serientermine
             {
                 throw new Exception($"Das Datum {value} konnte nicht geparst werden.");
             }
-
+            
             return dateTime;
         }
     }

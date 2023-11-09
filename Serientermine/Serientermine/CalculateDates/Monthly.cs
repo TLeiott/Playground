@@ -29,8 +29,8 @@ namespace Serientermine.CalculateDates
                 current = current.AddMonths(intervallNummer);
             }
 
-            UI.ConsoleWriter.LineColor($"[Monthly]", ConsoleColor.Yellow);
-            UI.ConsoleWriter.Color($"Begin: {begin.ToString("dd.MM.yyyy")}, End: {end.ToString("dd.MM.yyyy")}. Termine:");
+            UI.ConsoleWriter.LineColor($"[Monthly]", ConsoleColor.DarkYellow);
+            UI.ConsoleWriter.Color($"Begin: {begin.ToString("dd.MM.yyyy")}, End: {end.ToString("dd.MM.yyyy")}. Jeden {intervallNummer}ten-Monat. Termine:");
             Console.WriteLine();
             foreach (DateTime date in dates)
             {

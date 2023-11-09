@@ -29,8 +29,8 @@ namespace Serientermine.CalculateDates
                 current = current.AddDays(intervallNummer*7);
             }
 
-            UI.ConsoleWriter.LineColor($"[Daily]", ConsoleColor.DarkGreen);
-            UI.ConsoleWriter.Color($"Begin: {begin.ToString("dd.MM.yyyy")}, End: {end.ToString("dd.MM.yyyy")}. Termine:");
+            UI.ConsoleWriter.LineColor($"[Weekly]", ConsoleColor.DarkGreen);
+            UI.ConsoleWriter.Color($"Begin: {begin.ToString("dd.MM.yyyy")}, End: {end.ToString("dd.MM.yyyy")}. Jede {intervallNummer}te-Woche. Termine:");
             Console.WriteLine();
             foreach (DateTime date in dates)
             {
