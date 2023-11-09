@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+
 namespace Serientermine
 {
     internal class Program
@@ -13,7 +15,7 @@ namespace Serientermine
         {
             // NOTE: Das Einlesen der appsettings.json sollte nun funktionieren
             var host = Host.CreateDefaultBuilder(args).Build();
-
+            DateTime maxEnd= new DateTime(2099,12,31);
             try
             {
                 host.Start();
@@ -27,12 +29,12 @@ namespace Serientermine
 
                 foreach (var child in children)
                 {
-                    string wochentage;
+                    string wochentage="";
                     string name = child.GetValue<string>("Name");
                     string type = child.GetValue<string>("Type");
                     int intervallNummer = child.GetValue<int>("IntervallNummer");
                     DateTime begin = (DateTime)child.GetDateTime("Begin");
-                    DateTime? end = child.GetDateTime("Begin");
+                    DateTime? end = child.GetDateTime("end");
 
                     Serientermine.Serie serie = new Serientermine.Serie(name, type, intervallNummer, begin, end, wochentage);
                     seriesList.Add(serie);
@@ -44,12 +46,11 @@ namespace Serientermine
                 {
                     switch (serie.Type)
                     {
-                        case "Daily": CalculateDates.Daily.LOL(serie);
+                        case "Daily": CalculateDates.Daily.GetDates(serie, maxEnd);
                             break;
                         case "Weekly":
                             break;
                     }
-                    Console.WriteLine($"Name: {serie.Name}, Type: {serie.Type}, Begin: {serie.Begin}, End: {serie.End}");
                 }
             }
             finally

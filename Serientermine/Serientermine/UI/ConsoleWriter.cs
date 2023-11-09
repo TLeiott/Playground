@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -68,6 +69,11 @@ namespace Serientermine.UI
             }
             //Default farben wieder anwenden
             Console.ForegroundColor = defaultColor;
+        }
+        public static void DateTime(DateTime date, ConsoleColor color = ConsoleColor.White)
+        {
+            string s = date.ToString("dd/M/yyyy", CultureInfo.InvariantCulture);
+            UI.ConsoleWriter.LineColor(s, color);
         }
     }
 }
