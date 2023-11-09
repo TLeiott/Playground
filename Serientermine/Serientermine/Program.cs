@@ -48,7 +48,9 @@ namespace Serientermine
                     {
                         case "Daily": CalculateDates.Daily.GetDates(serie, maxEnd);
                             break;
-                        case "Weekly":
+                        case "Weekly": CalculateDates.Weekly.GetDates(serie, maxEnd);
+                            break;
+                        case "Monthly": CalculateDates.Monthly.GetDates(serie, maxEnd);
                             break;
                     }
                 }

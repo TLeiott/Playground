@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Serientermine.CalculateDates
 {
-    internal class Daily
+    internal class Weekly
     {
         public static void GetDates(Serientermine.Serie serie, DateTime end)
         {
@@ -26,15 +26,15 @@ namespace Serientermine.CalculateDates
             while (current <= end)
             {
                 dates.Add(current);
-                current = current.AddDays(intervallNummer);
+                current = current.AddDays(intervallNummer*7);
             }
 
-            UI.ConsoleWriter.LineColor($"[Weekly]", ConsoleColor.DarkCyan);
+            UI.ConsoleWriter.LineColor($"[Daily]", ConsoleColor.DarkGreen);
             UI.ConsoleWriter.Color($"Begin: {begin.ToString("dd.MM.yyyy")}, End: {end.ToString("dd.MM.yyyy")}. Termine:");
             Console.WriteLine();
             foreach (DateTime date in dates)
             {
-                UI.ConsoleWriter.Color($"|{date.ToString("dd.MM.yyyy")} | ",ConsoleColor.Cyan);
+                UI.ConsoleWriter.Color($"|{date.ToString("dd.MM.yyyy")} | ",ConsoleColor.Green);
                 UI.ConsoleWriter.Color(date.DayOfWeek.ToString());
                 Console.SetCursorPosition(25, Console.CursorTop);
                 UI.ConsoleWriter.Color(GetMonthName(date));
