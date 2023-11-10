@@ -34,7 +34,7 @@ namespace Serientermine.CalculateDates
             Console.WriteLine();
             foreach (DateTime date in dates)
             {
-                UI.ConsoleWriter.Color($"|{date.ToString("dd.MM.yyyy")} | ",ConsoleColor.Green);
+                UI.ConsoleWriter.Color($"|{date.ToString("dd.MM.yyyy")}| ",ConsoleColor.Green);
                 UI.ConsoleWriter.Color(date.DayOfWeek.ToString());
                 Console.SetCursorPosition(25, Console.CursorTop);
                 UI.ConsoleWriter.Color(GetMonthName(date));
