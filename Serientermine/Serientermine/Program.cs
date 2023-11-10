@@ -18,6 +18,7 @@ namespace Serientermine
             DateTime maxEnd = new DateTime(2099, 12, 31);
             try
             {
+                UI.ConsoleWriter.Color("DEBUG0", ConsoleColor.Red);
                 host.Start();
 
                 HostInstance = Host.CreateDefaultBuilder(args).Build();
@@ -26,7 +27,7 @@ namespace Serientermine
 
                 var config = HostInstance.Services.GetRequiredService<IConfiguration>();
                 var children = config.GetSection("Series").GetChildren();
-
+                UI.ConsoleWriter.Color("DEBUG1", ConsoleColor.Red);
                 foreach (var child in children)
                 {
                     string name = child.GetValue<string>("Name");
@@ -58,13 +59,14 @@ namespace Serientermine
                     seriesList.Add(serie);
 
                 }
-
+                UI.ConsoleWriter.Color("DEBUG2", ConsoleColor.Red);
                 // Jetzt enthält seriesList Ihre Liste von Serie-Objekten
                 foreach (Serientermine.Serie serie in seriesList)
                 {
+                    UI.ConsoleWriter.Color("DEBUG3", ConsoleColor.Red);
                     switch (serie.Type)
                     {
-                        case "Daily":
+                        case "Daily":UI.ConsoleWriter.Color("DEBUG2", ConsoleColor.Red);
                             CalculateDates.Daily.GetDates(serie, maxEnd);
                             break;
                         case "Weekly":

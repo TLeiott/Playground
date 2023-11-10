@@ -15,33 +15,64 @@ namespace Serientermine.CalculateDates
             DateTime? endUnsure = serie.End;
             DateTime current = begin;
             List<DateTime> dates = new List<DateTime>();
+            List<string> dayList = serie.DayList;
             int intervallNummer = serie.IntervallNummer;
-            string DayOfWeek;
 
-            if (endUnsure!=null)
+            if (endUnsure != null)
             {
                 end = Convert.ToDateTime(endUnsure);
             }
             Console.WriteLine();
-            while (current <= end)
+            if (serie.DayList.Count <= 0)
             {
-                dates.Add(current);
-                current = current.AddDays(intervallNummer);
+                while (current <= end)
+                {
+                    dates.Add(current);
+                    current = current.AddDays(intervallNummer);
+                }
+            }
+            else
+            {
+                string dayOfWeekString = "";
+                while (current <= end)//wenn im zeitraum
+                {
+                    foreach (string str in dayList)
+                    {
+                        if (int.TryParse(str, out int dayDate)) // für jedes TagesDatum in der Liste
+                        {
+                            if (current.Day == dayDate)
+                            {
+                                dates.Add(current);
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            dayOfWeekString = current.DayOfWeek.ToString();
+                            if (dayOfWeekString == str)
+                            {
+                                dates.Add(current);
+                                break;
+                            }
+                        }
+                    }
+                    current = current.AddDays(intervallNummer);// Tag
+                }
             }
 
-            UI.ConsoleWriter.LineColor($"[Daily]", ConsoleColor.DarkCyan);
+            UI.ConsoleWriter.LineColor($"[Daily] ({serie.Name})", ConsoleColor.DarkCyan);
             UI.ConsoleWriter.Color($"Begin: {begin.ToString("dd.MM.yyyy")}, End: {end.ToString("dd.MM.yyyy")}. Jeden {intervallNummer}ten-Tag. Termine:");
             Console.WriteLine();
             foreach (DateTime date in dates)
             {
-                UI.ConsoleWriter.Color($"|{date.ToString("dd.MM.yyyy")}| ",ConsoleColor.Cyan);
+                UI.ConsoleWriter.Color($"|{date.ToString("dd.MM.yyyy")}| ", ConsoleColor.Cyan);
                 UI.ConsoleWriter.Color(date.DayOfWeek.ToString());
                 Console.SetCursorPosition(25, Console.CursorTop);
                 UI.ConsoleWriter.Color(GetMonthName(date));
                 Console.WriteLine();
             }
-            UI.ConsoleWriter.Color($"Stats: {dates.Count} Tage mit Termin.  Duration: {(end-begin).TotalDays} Days");
-            Console.WriteLine();Console.WriteLine();
+            UI.ConsoleWriter.Color($"Stats: {dates.Count} Tage mit Termin.  Duration: {(end - begin).TotalDays} Days");
+            Console.WriteLine(); Console.WriteLine();
         }
         private static string GetMonthName(DateTime date)
         {

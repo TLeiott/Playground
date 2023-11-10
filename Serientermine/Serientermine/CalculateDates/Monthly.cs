@@ -16,7 +16,7 @@ namespace Serientermine.CalculateDates
             DateTime? endUnsure = serie.End;
             DateTime current = begin;
             List<DateTime> dates = new List<DateTime>();
-            List<string> dayList= serie.DayList;
+            List<string> dayList = serie.DayList;
             int intervallNummer = serie.IntervallNummer;
 
             if (endUnsure != null)
@@ -28,7 +28,6 @@ namespace Serientermine.CalculateDates
             {
                 while (current <= end)
                 {
-                    dates.Add(current.AddYears(1000));
                     current = current.AddMonths(intervallNummer);
                 }
                 UI.ConsoleWriter.Color($"{serie.DayList}");
@@ -39,15 +38,17 @@ namespace Serientermine.CalculateDates
                 {
                     string dayOfWeekString = "";
                     bool loop = true;
+                    string monthSaved = current.Month.ToString();
+                    while (current.Month.ToString() == monthSaved)
+                    {
                         foreach (string str in dayList)//für jeden Tag in der Liste
                         {
-                            if(int.TryParse(str, out int dayDate)) // für jedes TagesDatum in der Liste
+                            if (int.TryParse(str, out int dayDate)) // für jedes TagesDatum in der Liste
                             {
                                 if (current.Day == dayDate)
                                 {
                                     loop = false;
                                     dates.Add(current);
-                                    break;
                                 }
                             }
                             else
@@ -57,12 +58,15 @@ namespace Serientermine.CalculateDates
                                 {
                                     loop = false;
                                     dates.Add(current);
-                                    break;
                                 }
                             }
-                        //DEBUG Console.SetCursorPosition(0, 0); UI.ConsoleWriter.Color($"loop={loop}, str={str}, dayDate{dayDate}, dayOfWeekString={dayOfWeekString}, Current={current}", ConsoleColor.Magenta);
+                            /// DEBUG Console.SetCursorPosition(0,Console.CursorTop-1); UI.ConsoleWriter.Color($"loop={loop}, str={str}, dayDate{dayDate}, dayOfWeekString={dayOfWeekString}, Current={current}, CurrentMonth={current.Month}, savedMonth={monthSaved}", ConsoleColor.Magenta); Console.SetCursorPosition(0, Console.CursorTop + 1);
                         }
                         current = current.AddDays(1);//+1 Tag
+
+                    }
+                    current = current.AddMonths(-1);
+                    current = current.AddMonths(intervallNummer);
                 }
             }
 
