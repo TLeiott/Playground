@@ -38,7 +38,7 @@ namespace Serientermine.CalculateDates
                     string dayOfWeekString = "";
                     bool loop = true;
                     string weekSaved = current.ToString();
-                    for (int i = 0; i < 7 ; i++)
+                    for (int i = 0; i < 7; i++)
                     {
                         foreach (string str in dayList)//für jeden Tag in der Liste
                         {
@@ -59,28 +59,34 @@ namespace Serientermine.CalculateDates
                                     dates.Add(current);
                                 }
                             }
-                            Console.SetCursorPosition(0,Console.CursorTop-1); UI.ConsoleWriter.Color($"loop={loop}, str={str}, dayDate{dayDate}, dayOfWeekString={dayOfWeekString}, Current={current}, savedWeek={weekSaved}", ConsoleColor.Magenta); Console.SetCursorPosition(0, Console.CursorTop + 1);
+                            ///DEBUG Console.SetCursorPosition(0,Console.CursorTop-1); UI.ConsoleWriter.Color($"loop={loop}, str={str}, dayDate{dayDate}, dayOfWeekString={dayOfWeekString}, Current={current}, savedWeek={weekSaved}", ConsoleColor.Magenta); Console.SetCursorPosition(0, Console.CursorTop + 1);
                         }
                         current = current.AddDays(1);//+1 Tag
 
                     }
                     current = current.AddDays(-8);
-                    current = current.AddDays(7*intervallNummer);
+                    current = current.AddDays(7 * intervallNummer);
                 }
             }
 
             UI.ConsoleWriter.LineColor($"[Weekly]", ConsoleColor.DarkGreen);
             UI.ConsoleWriter.Color($"Begin: {begin.ToString("dd.MM.yyyy")}, End: {end.ToString("dd.MM.yyyy")}. Jede {intervallNummer}te-Woche. Termine:");
             Console.WriteLine();
+            int count = 0;
+            int limit = serie.Limit;
             foreach (DateTime date in dates)
             {
-                UI.ConsoleWriter.Color($"|{date.ToString("dd.MM.yyyy")}| ", ConsoleColor.Green);
-                UI.ConsoleWriter.Color(date.DayOfWeek.ToString());
-                Console.SetCursorPosition(25, Console.CursorTop);
-                UI.ConsoleWriter.Color(GetMonthName(date));
-                Console.WriteLine();
+                if (limit == 0 || count < limit)
+                {
+                    UI.ConsoleWriter.Color($"|{date.ToString("dd.MM.yyyy")}| ", ConsoleColor.Green);
+                    UI.ConsoleWriter.Color(date.DayOfWeek.ToString());
+                    Console.SetCursorPosition(25, Console.CursorTop);
+                    UI.ConsoleWriter.Color(GetMonthName(date));
+                    Console.WriteLine();
+                    count++;
+                }
             }
-            UI.ConsoleWriter.Color($"Stats: {dates.Count} Tage mit Termin.  Duration: {(end - begin).TotalDays} Days");
+            UI.ConsoleWriter.Color($"Stats: {dates.Count} Tage mit Termin.  Duration: {(end - begin).TotalDays} Days. Limit={limit}");
             Console.WriteLine(); Console.WriteLine();
         }
         private static string GetMonthName(DateTime date)
