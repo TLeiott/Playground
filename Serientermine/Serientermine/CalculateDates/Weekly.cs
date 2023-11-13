@@ -16,7 +16,7 @@ namespace Serientermine.CalculateDates
             DateTime current = begin;
             List<DateTime> dates = new List<DateTime>();
             List<string> dayList = serie.DayList;
-            int intervallNummer = serie.IntervallNummer;
+            int intervall = serie.Intervall;
 
             if (endUnsure != null)
             {
@@ -28,7 +28,7 @@ namespace Serientermine.CalculateDates
                 while (current <= end)
                 {
                     dates.Add(current);
-                    current = current.AddDays(intervallNummer * 7);
+                    current = current.AddDays(intervall * 7);
                 }
             }
             else
@@ -65,12 +65,12 @@ namespace Serientermine.CalculateDates
 
                     }
                     current = current.AddDays(-8);
-                    current = current.AddDays(7 * intervallNummer);
+                    current = current.AddDays(7 * intervall);
                 }
             }
 
             UI.ConsoleWriter.LineColor($"[Weekly]", ConsoleColor.DarkGreen);
-            UI.ConsoleWriter.Color($"Begin: {begin.ToString("dd.MM.yyyy")}, End: {end.ToString("dd.MM.yyyy")}. Jede {intervallNummer}te-Woche. Termine:");
+            UI.ConsoleWriter.Color($"Begin: {begin.ToString("dd.MM.yyyy")}, End: {end.ToString("dd.MM.yyyy")}. Jede {intervall}te-Woche. Termine:");
             Console.WriteLine();
             int count = 0;
             int limit = serie.Limit;

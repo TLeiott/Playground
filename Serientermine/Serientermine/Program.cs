@@ -30,22 +30,22 @@ namespace Serientermine
                 {
                     string name = child.GetValue<string>("Name");
                     string type = child.GetValue<string>("Type");
-                    int intervallNummer = child.GetValue<int>("IntervallNummer");
+                    int intervall = child.GetValue<int>("Intervall");
                     string dayOfWeek = child.GetValue<string>("Wochentage");
-                    int limit=child.GetValue<int>("limit");
+                    int limit = child.GetValue<int>("limit");
                     List<string> dayList = new List<string>();
                     if (dayOfWeek != null)
                     {
                         string[] tageArray = dayOfWeek.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                       dayList.AddRange(tageArray);
+                        dayList.AddRange(tageArray);
                     }
                     DateTime begin = (DateTime)child.GetDateTime("Begin");
                     DateTime? end = child.GetDateTime("end");
 
-                    Serientermine.Serie serie = new Serientermine.Serie(name, type, intervallNummer, begin, end, dayList,limit);
+                    Serientermine.Serie serie = new Serientermine.Serie(name, type, intervall, begin, end, dayList, limit);
                     seriesList.Add(serie);
 
-                }   
+                }
                 // Jetzt enthält seriesList Ihre Liste von Serie-Objekten
                 foreach (Serientermine.Serie serie in seriesList)
                 {
@@ -59,6 +59,9 @@ namespace Serientermine
                             break;
                         case "Monthly":
                             CalculateDates.Monthly.GetDates(serie, maxEnd);
+                            break;
+                        case "Yearly":
+                            CalculateDates.Yearly.GetDates(serie, maxEnd);
                             break;
                     }
                 }

@@ -17,7 +17,7 @@ namespace Serientermine.CalculateDates
             DateTime current = begin;
             List<DateTime> dates = new List<DateTime>();
             List<string> dayList = serie.DayList;
-            int intervallNummer = serie.IntervallNummer;
+            int intervall = serie.Intervall;
 
             if (endUnsure != null)
             {
@@ -29,7 +29,7 @@ namespace Serientermine.CalculateDates
                 while (current <= end)
                 {
                     dates.Add(current);
-                    current = current.AddMonths(intervallNummer);
+                    current = current.AddMonths(intervall);
                 }
             }
             else
@@ -66,12 +66,12 @@ namespace Serientermine.CalculateDates
 
                     }
                     current = current.AddMonths(-1);
-                    current = current.AddMonths(intervallNummer);
+                    current = current.AddMonths(intervall);
                 }
             }
 
             UI.ConsoleWriter.LineColor($"[Monthly] ({serie.Name})", ConsoleColor.DarkYellow);
-            UI.ConsoleWriter.Color($"Begin: {begin.ToString("dd.MM.yyyy")}, End: {end.ToString("dd.MM.yyyy")}. Jeden {intervallNummer}ten-Monat. Termine:");
+            UI.ConsoleWriter.Color($"Begin: {begin.ToString("dd.MM.yyyy")}, End: {end.ToString("dd.MM.yyyy")}. Jeden {intervall}ten-Monat. Termine:");
             Console.WriteLine();
             int count = 0;
             int limit = serie.Limit;

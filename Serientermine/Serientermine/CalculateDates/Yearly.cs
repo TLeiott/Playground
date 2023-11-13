@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Serientermine.CalculateDates
 {
-    internal class Daily
+    internal class Yearly
     {
         public static void GetDates(Serientermine.Serie serie, DateTime end)
         {
@@ -27,49 +28,59 @@ namespace Serientermine.CalculateDates
             {
                 while (current <= end)
                 {
+                    CorrectDate(current, begin, end, dayList);
                     dates.Add(current);
-                    current = current.AddDays(intervall);
+                    current = current.AddMonths(intervall*12);
                 }
             }
             else
             {
-                string dayOfWeekString = "";
                 while (current <= end)//wenn im zeitraum
                 {
-                    foreach (string str in dayList)
+                    string dayOfWeekString = "";
+                    bool loop = true;
+                    string monthSaved = current.Month.ToString();
+                    while (current.Month.ToString() == monthSaved)
                     {
-                        if (int.TryParse(str, out int dayDate)) // für jedes TagesDatum in der Liste
+                        foreach (string str in dayList)//für jeden Tag in der Liste
                         {
-                            if (current.Day == dayDate)
+                            if (int.TryParse(str, out int dayDate)) // für jedes TagesDatum in der Liste
                             {
-                                dates.Add(current);
-                                break;
+                                if (current.Day == dayDate)
+                                {
+                                    loop = false;
+                                    dates.Add(current);
+                                }
                             }
-                        }
-                        else
-                        {
-                            dayOfWeekString = current.DayOfWeek.ToString();
-                            if (dayOfWeekString == str)
+                            else
                             {
-                                dates.Add(current);
-                                break;
+                                dayOfWeekString = current.DayOfWeek.ToString();
+                                if (dayOfWeekString == str)
+                                {
+                                    loop = false;
+                                    dates.Add(current);
+                                }
                             }
+                            /// DEBUG Console.SetCursorPosition(0,Console.CursorTop-1); UI.ConsoleWriter.Color($"loop={loop}, str={str}, dayDate{dayDate}, dayOfWeekString={dayOfWeekString}, Current={current}, CurrentMonth={current.Month}, savedMonth={monthSaved}", ConsoleColor.Magenta); Console.SetCursorPosition(0, Console.CursorTop + 1);
                         }
+                        current = current.AddDays(1);//+1 Tag
+
                     }
-                    current = current.AddDays(intervall);// Tag
+                    current = current.AddMonths(-1);
+                    current = current.AddMonths(intervall);
                 }
             }
 
-            UI.ConsoleWriter.LineColor($"[Daily] ({serie.Name})", ConsoleColor.DarkCyan);
-            UI.ConsoleWriter.Color($"Begin: {begin.ToString("dd.MM.yyyy")}, End: {end.ToString("dd.MM.yyyy")}. Jeden {intervall}ten-Tag. Termine:");
+            UI.ConsoleWriter.LineColor($"[Monthly] ({serie.Name})", ConsoleColor.DarkMagenta);
+            UI.ConsoleWriter.Color($"Begin: {begin.ToString("dd.MM.yyyy")}, End: {end.ToString("dd.MM.yyyy")}. Jeden {intervall}ten-Monat. Termine:");
             Console.WriteLine();
-            int count=0;
-            int limit=serie.Limit;
+            int count = 0;
+            int limit = serie.Limit;
             foreach (DateTime date in dates)
             {
                 if (limit == 0 || count < limit)
                 {
-                    UI.ConsoleWriter.Color($"|{date.ToString("dd.MM.yyyy")}| ", ConsoleColor.Cyan);
+                    UI.ConsoleWriter.Color($"|{date.ToString("dd.MM.yyyy")}| ", ConsoleColor.Magenta);
                     UI.ConsoleWriter.Color(date.DayOfWeek.ToString());
                     Console.SetCursorPosition(25, Console.CursorTop);
                     UI.ConsoleWriter.Color(GetMonthName(date));
@@ -77,7 +88,7 @@ namespace Serientermine.CalculateDates
                     count++;
                 }
             }
-            UI.ConsoleWriter.Color($"Stats: {dates.Count} Tage mit Termin.  Duration: {(end - begin).TotalDays} Days. Limit={limit}");
+            UI.ConsoleWriter.Color($"Stats: {dates.Count} Tage mit Termin.  Duration: {(end - begin).TotalDays} Days. Limit= {limit}");
             Console.WriteLine(); Console.WriteLine();
         }
         private static string GetMonthName(DateTime date)
@@ -99,6 +110,10 @@ namespace Serientermine.CalculateDates
                 case 12: name = "Dezember"; break;
             }
             return name;
+        }
+        private static DateTime CorrectDate(DateTime current, DateTime start, DateTime end, List<String> dayList)
+        {
+            return current;
         }
     }
 }
