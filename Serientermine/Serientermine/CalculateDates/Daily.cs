@@ -23,7 +23,7 @@ namespace Serientermine.CalculateDates
                 end = Convert.ToDateTime(endUnsure);
             }
             Console.WriteLine();
-            if (serie.DayList.Count <= 0)
+            if (dayList.Count <= 0)
             {
                 while (current <= end)
                 {
@@ -73,12 +73,14 @@ namespace Serientermine.CalculateDates
                     UI.ConsoleWriter.Color(date.DayOfWeek.ToString());
                     Console.SetCursorPosition(25, Console.CursorTop);
                     UI.ConsoleWriter.Color(GetMonthName(date));
+                    UI.ConsoleWriter.Color(date.Month.ToString(), ConsoleColor.Red);
                     Console.WriteLine();
                     count++;
                 }
             }
             UI.ConsoleWriter.Color($"Stats: {dates.Count} Tage mit Termin.  Duration: {(end - begin).TotalDays} Days. Limit={limit}");
-            Console.WriteLine(); Console.WriteLine();
+            Console.WriteLine(); 
+            Console.WriteLine();
         }
         private static string GetMonthName(DateTime date)
         {

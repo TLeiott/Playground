@@ -1,15 +1,18 @@
-﻿using System;
+﻿using Microsoft.Extensions.Primitives;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Serientermine.CalculateDates
 {
     internal class Yearly
     {
+        /// <summary>
+        /// Yearly Calculating system
+        /// </summary>
+        /// <param name="serie">Die Haubt Klasse "Serie"</param>
+        /// <param name="end">das maximale ende als Limitierung</param>
         public static void GetDates(Serientermine.Serie serie, DateTime end)
         {
             DateTime begin = serie.Begin;
@@ -17,59 +20,39 @@ namespace Serientermine.CalculateDates
             DateTime current = begin;
             List<DateTime> dates = new List<DateTime>();
             List<string> dayList = serie.DayList;
+            List<int> weekdayList = serie.WeekdayList;
+            List<int> monthsList = serie.MonthsList;
             int intervall = serie.Intervall;
 
-            if (endUnsure != null)
-            {
-                end = Convert.ToDateTime(endUnsure);
-            }
-            Console.WriteLine();
-            if (serie.DayList.Count <= 0)
-            {
-                while (current <= end)
-                {
-                    CorrectDate(current, begin, end, dayList);
-                    dates.Add(current);
-                    current = current.AddMonths(intervall*12);
-                }
-            }
-            else
-            {
-                while (current <= end)//wenn im zeitraum
-                {
-                    string dayOfWeekString = "";
-                    bool loop = true;
-                    string monthSaved = current.Month.ToString();
-                    while (current.Month.ToString() == monthSaved)
-                    {
-                        foreach (string str in dayList)//für jeden Tag in der Liste
-                        {
-                            if (int.TryParse(str, out int dayDate)) // für jedes TagesDatum in der Liste
-                            {
-                                if (current.Day == dayDate)
-                                {
-                                    loop = false;
-                                    dates.Add(current);
-                                }
-                            }
-                            else
-                            {
-                                dayOfWeekString = current.DayOfWeek.ToString();
-                                if (dayOfWeekString == str)
-                                {
-                                    loop = false;
-                                    dates.Add(current);
-                                }
-                            }
-                            /// DEBUG Console.SetCursorPosition(0,Console.CursorTop-1); UI.ConsoleWriter.Color($"loop={loop}, str={str}, dayDate{dayDate}, dayOfWeekString={dayOfWeekString}, Current={current}, CurrentMonth={current.Month}, savedMonth={monthSaved}", ConsoleColor.Magenta); Console.SetCursorPosition(0, Console.CursorTop + 1);
-                        }
-                        current = current.AddDays(1);//+1 Tag
+            //switch ((dayList, ListeGefüllt(weekdayList), ListeGefüllt(monthsList)))
+            //{
+            //    case (false, false, false):
+            //        while (current <= end)
+            //                {
+            //                    dates.Add(current);
+            //                    current = current.AddYears(intervall);
+            //                }
+            //            break;
+            //}
 
-                    }
-                    current = current.AddMonths(-1);
-                    current = current.AddMonths(intervall);
-                }
-            }
+            //if (endUnsure != null)
+            //{
+            //    end = Convert.ToDateTime(endUnsure);
+            //}
+            //Console.WriteLine();
+            //if (dayList.Count <= 0 && weekdayList.Count <= 0)
+            //{
+            //    while (current <= end)
+            //    {
+            //        CorrectDate(current, begin, end, dayList);
+            //        dates.Add(current);
+            //        current = current.AddMonths(intervall * 12);
+            //    }
+            //}
+            //else if (dayList.Count! <= 0 &&  weekdayList.Count <= 0)
+            //{
+            //
+            //}
 
             UI.ConsoleWriter.LineColor($"[Monthly] ({serie.Name})", ConsoleColor.DarkMagenta);
             UI.ConsoleWriter.Color($"Begin: {begin.ToString("dd.MM.yyyy")}, End: {end.ToString("dd.MM.yyyy")}. Jeden {intervall}ten-Monat. Termine:");
@@ -93,27 +76,30 @@ namespace Serientermine.CalculateDates
         }
         private static string GetMonthName(DateTime date)
         {
-            string name = "";
-            switch (date.Month)
+            return date.Month switch
             {
-                case 1: name = "Januar"; break;
-                case 2: name = "Februar"; break;
-                case 3: name = "März"; break;
-                case 4: name = "April"; break;
-                case 5: name = "Mai"; break;
-                case 6: name = "Juni"; break;
-                case 7: name = "Juli"; break;
-                case 8: name = "August"; break;
-                case 9: name = "September"; break;
-                case 10: name = "Oktober"; break;
-                case 11: name = "Movember"; break;
-                case 12: name = "Dezember"; break;
-            }
-            return name;
+                1 => "Januar",
+                2 => "Februar",
+                3 => "März",
+                4 => "April",
+                5 => "Mai",
+                6 => "Juni",
+                7 => "Juli",
+                8 => "August",
+                9 => "September",
+                10 => "Oktober",
+                11 => "Movember",
+                12 => "Dezember",
+                _ => string.Empty,
+            };
         }
         private static DateTime CorrectDate(DateTime current, DateTime start, DateTime end, List<String> dayList)
         {
             return current;
+        }
+        private static bool ListeGefüllt<T>(List<T> liste)
+        {
+            return liste.Count > 0;
         }
     }
 }
