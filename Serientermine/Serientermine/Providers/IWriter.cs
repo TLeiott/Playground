@@ -9,6 +9,6 @@ namespace Serientermine.Providers
 {
     internal interface IWriter
     {
-        void Write(ISerie serie, DateTime start, DateTime end);
+        void Write(ISerie serie, DateTime start, DateTime end, DateTime rangeStart, DateTime rangeEnd);
     }
 }

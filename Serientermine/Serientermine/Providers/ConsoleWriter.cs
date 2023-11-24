@@ -10,7 +10,7 @@ namespace Serientermine.Providers
 {
     internal sealed class ConsoleWriter : IWriter
     {
-        public void Write(ISerie serie, DateTime start, DateTime end)
+        public void Write(ISerie serie, DateTime start, DateTime end, DateTime rangeStart, DateTime rangeEnd)
         {
             ConsoleColor color;
             ConsoleColor darkColor;
@@ -42,7 +42,7 @@ namespace Serientermine.Providers
             Console.WriteLine();
             int count = 0;
             int limit = serie.Limit;
-            foreach (DateTime date in serie.GetDatesInRange(start, end))
+            foreach (DateTime date in serie.GetDatesInRange(start, end, rangeStart, rangeEnd))
             {
                 UI.ConsoleWriter.Color($"|{date.ToString("dd.MM.yyyy")}| ", color);
                 UI.ConsoleWriter.Color(date.DayOfWeek.ToString());

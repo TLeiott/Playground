@@ -17,11 +17,11 @@ namespace Serientermine
             Console.CursorVisible = false;
             // NOTE: Das Einlesen der appsettings.json sollte nun funktionieren
             var host = Host.CreateDefaultBuilder(args).Build();
-
+            Console.WriteLine("TEST");
             try
             {
-                var begin = new DateTime(2020, 1, 1);
-                var end = new DateTime(2030, 12, 31);
+                var rangeStart = new DateTime(1900, 1, 1);
+                var rangeEnd = new DateTime(2050, 12, 31);
                 host.Start();
 
                 var series = GetSeries(host);
@@ -30,7 +30,7 @@ namespace Serientermine
                 // Jetzt enthält seriesList Ihre Liste von Serie-Objekten
                 foreach (var serie in series)
                 {
-                    writer.Write(serie, begin, end);
+                    writer.Write(serie, rangeStart, rangeEnd, rangeStart, rangeEnd);
                 }
 
                 Console.Read();
@@ -74,7 +74,7 @@ namespace Serientermine
                     case "Monthly":
                         serie = new MonthlySerie
                         {
-                            DayList = GetDayList(child.GetValue<string>("Wochentage"))
+                            DayList = GetDayList(child.GetValue<string>("TagImMonat"))
                         };
                         break;
                     case "Yearly":

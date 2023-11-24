@@ -18,7 +18,7 @@ namespace Serientermine.Series
 
         public override string IntervallDescription => $"Jede(n) {Intervall}. Tag";
 
-        public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end)
+        public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end, DateTime rangeStart, DateTime rangeEnd)
         {
             DateTime begin = Begin;
             DateTime? endUnsure = End;

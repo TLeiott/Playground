@@ -16,7 +16,7 @@ namespace Serientermine.Series
         public override SerieType Type => SerieType.Weekly;
 
         public override string IntervallDescription => $"Jede(n) {Intervall}. Woche";
-        public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end)
+        public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end, DateTime rangeStart, DateTime rangeEnd)
         {
             if (DayList == null || DayList.Count == 0)
                 yield break;
@@ -25,9 +25,10 @@ namespace Serientermine.Series
             List<string> dayList = DayList;
             int intervall = Intervall;
 
-            var (rangeStart, rangeEnd) = GetDatesForOutput(start, end);
-            var current = rangeStart;
-            while (current <= rangeEnd)//wenn im zeitraum
+            var (checkedStart, checkedEnd) = GetDatesForOutput(start, end, rangeStart, rangeEnd);
+            var current = checkedStart;
+            UI.ConsoleWriter.LineColor($"{current} <= {checkedEnd}",ConsoleColor.Red);
+            while (current <= checkedEnd)//wenn im zeitraum
             {
                 string dayOfWeekString = "";
                 bool loop = true;

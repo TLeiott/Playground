@@ -23,20 +23,19 @@ namespace Serientermine.Series
 
         public int Limit { get; set; }
 
-        public abstract IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end);
+        public abstract IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end, DateTime rangeStart, DateTime rangeEnd);
 
-        protected (DateTime start, DateTime end) GetDatesForOutput(DateTime start, DateTime end)
+        protected (DateTime start, DateTime end) GetDatesForOutput(DateTime start, DateTime end, DateTime rangeStart, DateTime rangeEnd)
         {
-            DateTime begin = start;
-            DateTime? endUnsure = end;
-            DateTime current = begin;
-
-            if (endUnsure != null)
+            if (start < rangeStart)
             {
-                end = Convert.ToDateTime(endUnsure);
+                start = rangeStart;
             }
-
-            return (current, end);
+            if (end > rangeEnd)
+            {
+                end = rangeEnd;
+            }
+            return (start, end);
         }
     }
 }
