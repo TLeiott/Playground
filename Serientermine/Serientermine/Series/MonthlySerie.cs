@@ -7,21 +7,20 @@ using System.Threading.Tasks;
 
 namespace Serientermine.Series
 {
-    internal sealed class DailySerie : SerieBase
+    internal class MonthlySerie : SerieBase
     {
-        /// <summary>
-        /// Liste der Tage in einer Woche
-        /// </summary>
         public List<string> DayList { get; set; }
 
-        public override SerieType Type => SerieType.Daily;
+        public override SerieType Type => SerieType.Monthly;
 
-        public override string IntervallDescription => $"Jede(n) {Intervall}. Tag";
-
+        public override string IntervallDescription => $"Jede(n) {Intervall}. Monat";
         public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end)
         {
-            DateTime begin = Begin;
-            DateTime? endUnsure = End;
+            if (DayList == null || DayList.Count == 0)
+                yield break;
+
+            DateTime begin = start;
+            DateTime? endUnsure = end;
             DateTime current = begin;
             List<string> dayList = DayList;
             int intervall = Intervall;
@@ -31,20 +30,14 @@ namespace Serientermine.Series
                 end = Convert.ToDateTime(endUnsure);
             }
             Console.WriteLine();
-            if (dayList.Count <= 0)
-            {
-                while (current <= end)
-                {
-                    yield return current;
-                    current = current.AddDays(intervall);
-                }
-            }
-            else
+            while (current <= end)//wenn im zeitraum
             {
                 string dayOfWeekString = "";
-                while (current <= end)//wenn im zeitraum
+                bool loop = true;
+                string monthSaved = current.Month.ToString();
+                while (current.Month.ToString() == monthSaved)
                 {
-                    foreach (string str in dayList)
+                    foreach (string str in dayList)//für jeden Tag in der Liste
                     {
                         if (int.TryParse(str, out int dayDate)) // für jedes TagesDatum in der Liste
                         {
@@ -63,9 +56,13 @@ namespace Serientermine.Series
                                 break;
                             }
                         }
+                        // DEBUG Console.SetCursorPosition(0,Console.CursorTop-1); UI.ConsoleWriter.Color($"loop={loop}, str={str}, dayDate{dayDate}, dayOfWeekString={dayOfWeekString}, Current={current}, CurrentMonth={current.Month}, savedMonth={monthSaved}", ConsoleColor.Magenta); Console.SetCursorPosition(0, Console.CursorTop + 1);
                     }
-                    current = current.AddDays(intervall);// Tag
+                    current = current.AddDays(1);//+1 Tag
+
                 }
+                current = current.AddMonths(-1);
+                current = current.AddMonths(intervall);
             }
         }
     }

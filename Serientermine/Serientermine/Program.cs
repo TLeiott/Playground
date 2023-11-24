@@ -20,8 +20,8 @@ namespace Serientermine
 
             try
             {
-                var begin = new DateTime(2023, 1, 1);
-                var end = new DateTime(2023, 3, 31);
+                var begin = new DateTime(2020, 1, 1);
+                var end = new DateTime(2030, 12, 31);
                 host.Start();
 
                 var series = GetSeries(host);
@@ -66,7 +66,17 @@ namespace Serientermine
                         };
                         break;
                     case "Weekly":
+                        serie = new WeeklySerie
+                        {
+                            DayList = GetDayList(child.GetValue<string>("Wochentage"))
+                        };
+                        break;
                     case "Monthly":
+                        serie = new MonthlySerie
+                        {
+                            DayList = GetDayList(child.GetValue<string>("Wochentage"))
+                        };
+                        break;
                     case "Yearly":
                         continue;
                     default:                        

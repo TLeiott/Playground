@@ -1,0 +1,19 @@
+﻿@page
+@model MyFirstWebsite.Pages.Company.IndexModel
+@{
+	var counter = 1;
+	ViewData["Title"] = "Über meine Firma";
+}
+
+@section Scripts {
+	<div>Footer</div>
+	<script>
+		var id = document.getElementById("compid");
+	</script>
+}
+
+
+<div id="compid" class="company">
+	<h1>Counter: @counter</h1>
+	<p>Mein Inhalt</p>
+</div>

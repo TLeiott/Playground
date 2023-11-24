@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Serientermine.CalculateDates
 {
-    internal class Monthly
+    internal class MonthlySerie
     {
         public static void GetDates(Serientermine.Serie serie, DateTime end)
         {
