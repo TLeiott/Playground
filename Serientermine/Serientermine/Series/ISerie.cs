@@ -46,6 +46,6 @@ namespace Serientermine.Series
         /// <summary>
         /// Liefert die Daten im angegebenen Zeitraum
         /// </summary>
-        IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end, DateTime rangeStart, DateTime rangeEnd);
+        IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end);
     }
 }

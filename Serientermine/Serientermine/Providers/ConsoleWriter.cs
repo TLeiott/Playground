@@ -42,7 +42,7 @@ namespace Serientermine.Providers
             Console.WriteLine();
             int count = 0;
             int limit = serie.Limit;
-            foreach (DateTime date in serie.GetDatesInRange(start, end, rangeStart, rangeEnd))
+            foreach (DateTime date in serie.GetDatesInRange(start, end))
             {
                 UI.ConsoleWriter.Color($"|{date.ToString("dd.MM.yyyy")}| ", color);
                 UI.ConsoleWriter.Color(date.DayOfWeek.ToString());

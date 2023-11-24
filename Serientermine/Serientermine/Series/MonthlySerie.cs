@@ -14,7 +14,7 @@ namespace Serientermine.Series
         public override SerieType Type => SerieType.Monthly;
 
         public override string IntervallDescription => $"Jede(n) {Intervall}. Monat";
-        public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end, DateTime rangeStart, DateTime rangeEnd)
+        public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end)
         {
             if (DayList == null || DayList.Count == 0)
                 yield break;
