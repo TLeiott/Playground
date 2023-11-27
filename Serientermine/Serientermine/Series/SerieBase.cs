@@ -22,22 +22,23 @@ namespace Serientermine.Series
         public abstract string IntervallDescription { get; }
 
         public int Limit { get; set; }
+        public int MonthDay { get; set; }
 
         public abstract IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end);
 
         protected (DateTime start, DateTime end) GetDatesForOutput(DateTime start, DateTime end)
         {
-            UI.ConsoleWriter.LineColor($"Limit(-;+): ({start}; {end}); Bereich(von;bis): ({Begin}; {End})", ConsoleColor.Red);
+            //UI.ConsoleWriter.LineColor($"Limit(-;+): ({start}; {end}); Bereich(von;bis): ({Begin}; {End})", ConsoleColor.Red);
             if (Begin > start)
             {
                 start = Begin;
             }
-            if (End < end&&End!=null)
+            if (End != null && End < end)
             {
-                end = (DateTime)End;
+                end = End.Value;
             }
-            UI.ConsoleWriter.LineColor($"Limit(-;+): ({start}; {end}); Bereich(von;bis): ({Begin}; {End})", ConsoleColor.Red);
-            UI.ConsoleWriter.LineColor($"-----------------------------------------------------", ConsoleColor.Red);
+            //UI.ConsoleWriter.LineColor($"Limit(-;+): ({start}; {end}); Bereich(von;bis): ({Begin}; {End})", ConsoleColor.Red);
+            //UI.ConsoleWriter.LineColor($"-----------------------------------------------------", ConsoleColor.Red);
             return (start, end);
         }
     }

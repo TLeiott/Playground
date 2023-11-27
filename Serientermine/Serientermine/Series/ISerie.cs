@@ -43,6 +43,8 @@ namespace Serientermine.Series
         /// </summary>
         int Limit { get; }
 
+        int MonthDay { get; }
+
         /// <summary>
         /// Liefert die Daten im angegebenen Zeitraum
         /// </summary>

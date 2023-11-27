@@ -20,7 +20,7 @@ namespace Serientermine
             try
             {
                 var rangeStart = new DateTime(2023, 1, 1);
-                var rangeEnd = new DateTime(2050, 12, 31);
+                var rangeEnd = new DateTime(2023, 4, 10);
                 host.Start();
 
                 var series = GetSeries(host);
@@ -73,7 +73,7 @@ namespace Serientermine
                     case "Monthly":
                         serie = new MonthlySerie
                         {
-                            DayList = GetDayList(child.GetValue<string>("TagImMonat"))
+                            DayList = GetDayList(child.GetValue<string>("Wochentage"))
                         };
                         break;
                     case "Yearly":
@@ -87,6 +87,7 @@ namespace Serientermine
                 serie.Limit = child.GetValue<int>("limit");
                 serie.Begin = (DateTime)child.GetDateTime("Begin");
                 serie.End = child.GetDateTime("end");
+                serie.MonthDay = child.GetValue<int>("TagImMonat");
 
                 list.Add(serie);
 
