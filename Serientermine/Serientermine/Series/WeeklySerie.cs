@@ -30,7 +30,6 @@ namespace Serientermine.Series
             while (current <= checkedEnd)//wenn im zeitraum
             {
                 string dayOfWeekString = "";
-                bool loop = true;
                 string weekSaved = current.ToString();
                 for (int i = 0; i < 7; i++)
                 {

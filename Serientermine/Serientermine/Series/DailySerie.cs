@@ -1,6 +1,8 @@
 ﻿using Serientermine.Serientermine;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,20 +22,15 @@ namespace Serientermine.Series
 
         public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end)
         {
-            DateTime begin = Begin;
-            DateTime? endUnsure = End;
-            DateTime current = begin;
+            Console.WriteLine();
             List<string> dayList = DayList;
             int intervall = Intervall;
 
-            if (endUnsure != null)
-            {
-                end = Convert.ToDateTime(endUnsure);
-            }
-            Console.WriteLine();
+            var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
+            var current = checkedStart;
             if (dayList.Count <= 0)
             {
-                while (current <= end)
+                while (current <= checkedEnd)
                 {
                     yield return current;
                     current = current.AddDays(intervall);
@@ -42,7 +39,7 @@ namespace Serientermine.Series
             else
             {
                 string dayOfWeekString = "";
-                while (current <= end)//wenn im zeitraum
+                while (current <= checkedEnd)//wenn im zeitraum
                 {
                     foreach (string str in dayList)
                     {

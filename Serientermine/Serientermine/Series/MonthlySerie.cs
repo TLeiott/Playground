@@ -1,6 +1,8 @@
 ﻿using Serientermine.Serientermine;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,22 +20,16 @@ namespace Serientermine.Series
         {
             if (DayList == null || DayList.Count == 0)
                 yield break;
-
-            DateTime begin = start;
-            DateTime? endUnsure = end;
-            DateTime current = begin;
+            Console.WriteLine();
             List<string> dayList = DayList;
             int intervall = Intervall;
 
-            if (endUnsure != null)
-            {
-                end = Convert.ToDateTime(endUnsure);
-            }
-            Console.WriteLine();
-            while (current <= end)//wenn im zeitraum
+            var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
+            var current = checkedStart;
+            UI.ConsoleWriter.LineColor($"{current} <= {checkedEnd}", ConsoleColor.Red);
+            while (current <= checkedEnd)//wenn im zeitraum
             {
                 string dayOfWeekString = "";
-                bool loop = true;
                 string monthSaved = current.Month.ToString();
                 while (current.Month.ToString() == monthSaved)
                 {

@@ -27,10 +27,17 @@ namespace Serientermine.Series
 
         protected (DateTime start, DateTime end) GetDatesForOutput(DateTime start, DateTime end)
         {
-            UI.ConsoleWriter.LineColor($"start: {start}; end: {end}", ConsoleColor.Red);
-            
-
-
+            UI.ConsoleWriter.LineColor($"Limit(-;+): ({start}; {end}); Bereich(von;bis): ({Begin}; {End})", ConsoleColor.Red);
+            if (Begin > start)
+            {
+                start = Begin;
+            }
+            if (End < end&&End!=null)
+            {
+                end = (DateTime)End;
+            }
+            UI.ConsoleWriter.LineColor($"Limit(-;+): ({start}; {end}); Bereich(von;bis): ({Begin}; {End})", ConsoleColor.Red);
+            UI.ConsoleWriter.LineColor($"-----------------------------------------------------", ConsoleColor.Red);
             return (start, end);
         }
     }
