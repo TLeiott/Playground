@@ -18,16 +18,24 @@ namespace Serientermine.Series
         public override string IntervallDescription => $"Jede(n) {Intervall}. Woche";
         public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end)
         {
+            //leere angaben bei "Wochentage" herausfiltern
             if (DayList == null || DayList.Count == 0)
                 yield break;
-            Console.WriteLine();
             List<string> dayList = DayList;
             int intervall = Intervall;
+            Console.WriteLine();
 
+            //Startdatum definieren
             var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
             var current = checkedStart;
-            UI.ConsoleWriter.LineColor($"{current} <= {checkedEnd}", ConsoleColor.Red);
-            while (current <= checkedEnd)//wenn im zeitraum
+
+            //auf den Letzten Montag zurückgehen um eine verschobene Wochenberechnung zu verhindern
+            int daysUntilLastMonday = ((int)current.DayOfWeek - (int)DayOfWeek.Monday + 7) % 7;
+            current = current.AddDays(-daysUntilLastMonday);
+
+            int count = 0;//Counter für das Terminlimit
+
+            while (current <= checkedEnd&&count<Limit)//wenn im zeitraum
             {
                 string dayOfWeekString = "";
                 string weekSaved = current.ToString();
@@ -39,7 +47,11 @@ namespace Serientermine.Series
                         {
                             if (current.Day == dayDate)
                             {
-                                yield return current;
+                                if (current >= checkedStart)
+                                {
+                                    yield return current;
+                                    count++;
+                                }
                                 break;
                             }
                         }
@@ -48,7 +60,11 @@ namespace Serientermine.Series
                             dayOfWeekString = current.DayOfWeek.ToString();
                             if (dayOfWeekString == str)
                             {
-                                yield return current;
+                                if (current >= checkedStart)
+                                {
+                                    yield return current;
+                                    count++;
+                                }
                                 break;
                             }
                         }

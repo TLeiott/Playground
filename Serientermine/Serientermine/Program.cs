@@ -17,10 +17,9 @@ namespace Serientermine
             Console.CursorVisible = false;
             // NOTE: Das Einlesen der appsettings.json sollte nun funktionieren
             var host = Host.CreateDefaultBuilder(args).Build();
-            Console.WriteLine("TEST");
             try
             {
-                var rangeStart = new DateTime(1900, 1, 1);
+                var rangeStart = new DateTime(2023, 1, 1);
                 var rangeEnd = new DateTime(2050, 12, 31);
                 host.Start();
 

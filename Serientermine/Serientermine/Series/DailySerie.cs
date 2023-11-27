@@ -22,12 +22,14 @@ namespace Serientermine.Series
 
         public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end)
         {
-            Console.WriteLine();
             List<string> dayList = DayList;
             int intervall = Intervall;
 
+            //startdatum festlegen
             var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
             var current = checkedStart;
+
+
             if (dayList.Count <= 0)
             {
                 while (current <= checkedEnd)
