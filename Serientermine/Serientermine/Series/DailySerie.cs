@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Serientermine.Series
 {
-    internal sealed class DailySerie : SerieBase
+    public sealed class DailySerie : SerieBase
     {
         /// <summary>
         /// Liste der Tage in einer Woche
         /// </summary>
-        public List<string> DayList { get; set; }
+        public List<string> DayList { get; set; } = new();
 
         public override SerieType Type => SerieType.Daily;
 

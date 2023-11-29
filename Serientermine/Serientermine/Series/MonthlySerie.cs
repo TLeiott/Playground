@@ -43,36 +43,37 @@ namespace Serientermine.Series
 
             if (DayList == null || DayList.Count == 0)
             {
-                CalculateDatesWithWeekday(checkedStart, checkedEnd, current, Limit);
+                //CalculateDatesWithWeekday(checkedStart, checkedEnd, current, Limit);
             }
             else//Wochentag angegeben
             {
             }
-            static void CalculateDatesWithWeekday(DateTime checkedStart, DateTime checkedEnd, DateTime current, int limit)
-            {
-                int count = 0;
-                while (current <= checkedEnd && count < limit)
-                {
-                    string dayOfWeekString = "";
-                    string monthSaved = current.Month.ToString();
-                    while (current.Month.ToString() == monthSaved)
-                    {
-                        if (current.Day == MonthDay)
-                        {
-                            if (current > checkedStart)
-                            {
-                                yield return current;
-                            }
-                            else
-                            {
-                                UI.ConsoleWriter.LineColor($"|{current.ToString("dd.MM.yyyy")}| {current.DayOfWeek} OutOfRangeDate", ConsoleColor.DarkGray);
-                            }
-                            count++;
-                            break;
-                        }
-                    }
-                }
-            }
+
+            //static void CalculateDatesWithWeekday(DateTime checkedStart, DateTime checkedEnd, DateTime current, int limit)
+            //{
+            //    int count = 0;
+            //    while (current <= checkedEnd && count < limit)
+            //    {
+            //        string dayOfWeekString = "";
+            //        string monthSaved = current.Month.ToString();
+            //        while (current.Month.ToString() == monthSaved)
+            //        {
+            //            if (current.Day == MonthDay)
+            //            {
+            //                if (current > checkedStart)
+            //                {
+            //                    yield return current;
+            //                }
+            //                else
+            //                {
+            //                    UI.ConsoleWriter.LineColor($"|{current.ToString("dd.MM.yyyy")}| {current.DayOfWeek} OutOfRangeDate", ConsoleColor.DarkGray);
+            //                }
+            //                count++;
+            //                break;
+            //            }
+            //        }
+            //    }
+            //}
         }
     }
 }//Die Berechnung von allem ist noch nicht perfekt, auch wenn die Titel von manchen commits anderes behaubten können. Vorallem Monthly ist gerade stark im Umbau. Viele fehler z.B. bei jeder 31 tag jeden monat existieren immernoch im Algorythmus. Jetzt wird das alles noch auf 2 einzelne Funktionen unterteilt. Der Code von vor der Teilung befindet sich darunter:
