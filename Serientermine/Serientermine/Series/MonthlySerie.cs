@@ -43,7 +43,7 @@ namespace Serientermine.Series
 
             if (DayList == null || DayList.Count == 0)//WOchentag nich angegeben
             {
-                CalculateDatesWithWeekday(checkedStart, checkedEnd, current, Limit);
+                //CalculateDatesWithWeekday(checkedStart, checkedEnd, current, Limit);
             }
             else//Wochentag angegeben
             {

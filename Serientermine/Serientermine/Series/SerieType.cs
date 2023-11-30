@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Serientermine.Series
 {
-    internal enum SerieType
+    public enum SerieType
     {
         Undefined = 0,
 

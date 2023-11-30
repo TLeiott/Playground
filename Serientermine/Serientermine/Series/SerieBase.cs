@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Serientermine.Series
 {
-    internal abstract class SerieBase : ISerie
+    public abstract class SerieBase : ISerie
     {
         public abstract SerieType Type { get; }
 

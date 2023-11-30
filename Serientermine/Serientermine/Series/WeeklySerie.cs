@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Serientermine.Series
 {
-    internal sealed class WeeklySerie : SerieBase
+    public sealed class WeeklySerie : SerieBase
     {
         public List<string> DayList { get; set; }
 
