@@ -29,19 +29,30 @@ namespace Serientermine.Series
             var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
             var current = checkedStart;
 
+            //Leeres Limit hochsetzen
+            if (Limit == 0)
+            {
+                Limit = 999999999;
+            }
+
+            int count = 0;//Counter für das Terminlimit
 
             if (dayList.Count <= 0)
             {
-                while (current <= checkedEnd)
+                while (current <= checkedEnd && count < Limit)
                 {
-                    yield return current;
+                    if (IsInRange(checkedStart, checkedEnd, current))
+                    {
+                        yield return current;
+                    }
+                    count++;
                     current = current.AddDays(intervall);
                 }
             }
             else
             {
                 string dayOfWeekString = "";
-                while (current <= checkedEnd)//wenn im zeitraum
+                while (current <= checkedEnd && count < Limit)//wenn im zeitraum
                 {
                     foreach (string str in dayList)
                     {
@@ -49,7 +60,11 @@ namespace Serientermine.Series
                         {
                             if (current.Day == dayDate)
                             {
-                                yield return current;
+                                if (IsInRange(checkedStart, checkedEnd, current))
+                                {
+                                    yield return current;
+                                }
+                                count++;
                                 break;
                             }
                         }
@@ -58,7 +73,11 @@ namespace Serientermine.Series
                             dayOfWeekString = current.DayOfWeek.ToString();
                             if (dayOfWeekString == str)
                             {
-                                yield return current;
+                                if (IsInRange(checkedStart, checkedEnd, current))
+                                {
+                                    yield return current;
+                                }
+                                count++;
                                 break;
                             }
                         }
@@ -67,5 +86,14 @@ namespace Serientermine.Series
                 }
             }
         }
+        private bool IsInRange(DateTime checkedStart, DateTime checkedEnd, DateTime current)
+        {
+            if (current >= checkedStart && current <= checkedEnd)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }
+//Daily sollte neu geschrieben werden wie der versuch limit zu integrieren gezeigt hat. In der aktuellen version von Daily sind noch funktionen drinnen, die nicht gebraucht werden. Beim neuschreiben muss sich dieses mal an den Kalender gehalten werden.    

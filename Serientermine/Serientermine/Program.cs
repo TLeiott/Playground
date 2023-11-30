@@ -19,7 +19,7 @@ namespace Serientermine
             var host = Host.CreateDefaultBuilder(args).Build();
             try
             {
-                var rangeStart = new DateTime(2010, 1, 1);
+                var rangeStart = new DateTime(2020, 1, 1);
                 var rangeEnd = new DateTime(2030, 1, 1);
                 host.Start();
 

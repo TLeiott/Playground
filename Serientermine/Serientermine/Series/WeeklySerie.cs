@@ -27,7 +27,7 @@ namespace Serientermine.Series
 
             //Startdatum definieren
             var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
-            var current = checkedStart;
+            var current = Begin;
 
             //auf den Letzten Montag zurückgehen um eine verschobene Wochenberechnung zu verhindern
             int daysUntilLastMonday = ((int)current.DayOfWeek - (int)DayOfWeek.Monday + 7) % 7;
@@ -43,19 +43,19 @@ namespace Serientermine.Series
                 {
                     foreach (string str in dayList)//für jeden Tag in der Liste
                     {
-                        if (int.TryParse(str, out int dayDate)) // für jedes TagesDatum in der Liste
+                        if (int.TryParse(str, out int dayDate) && count < Limit) // für jedes TagesDatum in der Liste
                         {
                             if (current.Day == dayDate)
                             {
                                 if (current >= checkedStart)
                                 {
                                     yield return current;
-                                    count++;
                                 }
+                                count++;
                                 break;
                             }
                         }
-                        else
+                        else if(count < Limit)
                         {
                             dayOfWeekString = current.DayOfWeek.ToString();
                             if (dayOfWeekString == str)
@@ -63,12 +63,12 @@ namespace Serientermine.Series
                                 if (current >= checkedStart)
                                 {
                                     yield return current;
-                                    count++;
                                 }
+                                count++;
+                                Console.WriteLine(count);
                                 break;
                             }
                         }
-                        //Console.SetCursorPosition(0,Console.CursorTop-1); UI.ConsoleWriter.Color($"loop={loop}, str={str}, dayDate{dayDate}, dayOfWeekString={dayOfWeekString}, Current={current}, savedWeek={weekSaved}", ConsoleColor.Magenta); Console.SetCursorPosition(0, Console.CursorTop + 1);
                     }
                     current = current.AddDays(1);//+1 Tag
 
@@ -80,3 +80,4 @@ namespace Serientermine.Series
         }
     }
 }
+//letzer Stand: Limit ist funktional wenn auch nicht ansehnlich. Macht einen Funktionierenden eindruck. Die serie früher als der Bereich zu starten funktionier dem anschein nach. Unitest allerdings immer output:null. Zu wenig erfahrung mit Unitest um das zu verstehen ->Nachfragen.
