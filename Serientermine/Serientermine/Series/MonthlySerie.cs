@@ -4,18 +4,25 @@ using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Serientermine.Series
 {
-    internal class MonthlySerie : SerieBase
+    /// <summary>
+    /// 
+    /// </summary>
+    public sealed class MonthlySerie : SerieBase
     {
         public List<string> DayList { get; set; }
 
         public override SerieType Type => SerieType.Monthly;
 
         public override string IntervallDescription => $"Jede(n) {Intervall}. Monat";
+
+        /// <inheritdoc cref="ISerie.GetDatesInRange(DateTime, DateTime)"/>
         public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end)
         {
             //leere angaben bei "TagImMonat" herausfiltern
@@ -27,14 +34,17 @@ namespace Serientermine.Series
                 yield break;
 
             List<string> dayList = DayList;
-            int intervall = Intervall;
 
             //Startdatum definieren
             var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
             var current = Begin;
 
-            int count = 0;//Counter für das Terminlimit
-            int weekDayCount = 1;//Counter für die Wochentage 
+            //Leeres Limit hochsetzen
+            if (Limit == 0)
+            {
+                Limit = 999999999;
+            }
+
             string targetDay = "";
             foreach (var day in dayList)
             {
@@ -43,36 +53,167 @@ namespace Serientermine.Series
 
             if (DayList == null || DayList.Count == 0)//WOchentag nich angegeben
             {
-                //CalculateDatesWithWeekday(checkedStart, checkedEnd, current, Limit);
+                var result = CalculateDatesWithoutWeekday(checkedStart, checkedEnd, current, Limit, MonthDay, targetDay);
+                foreach (var item in result)
+                    yield return item;
             }
             else//Wochentag angegeben
             {
+                if (MonthDay < 5)
+                {
+                    var result = CalculateDatesWithWeekday(checkedStart, checkedEnd, current, Limit, MonthDay, targetDay);
+                    foreach (var item in result)
+                        yield return item;
+                }
+                else
+                {
+                    var result = CalculateLastDatesWithWeekday(checkedStart, checkedEnd, current, Limit, MonthDay, targetDay);
+                    foreach (var item in result)
+                        yield return item;
+                }
+
             }
         }
-        private IEnumerable<DateTime> CalculateDatesWithWeekday(DateTime checkedStart, DateTime checkedEnd, DateTime current, int limit)
+
+        /// <summary>
+        /// Funktion zum berechnen von den Datums wenn kein Wochentag angegeben ist
+        /// </summary>
+        /// <param name="checkedStart">Start der anzuzeigenden Range</param>
+        /// <param name="checkedEnd">Ende der anzuzeigenden Range</param>
+        /// <param name="current">Das aktuelle datum welches genutzt wird zum durchskippen Tag für Tag</param>
+        /// <param name="limit">Maximales Limit für die anzahl an auszugebenden Datums</param>
+        /// <param name="MonthDay">Der wievielte angegebene Wochentag ausgegeben werden soll</param>
+        /// <param name="targetDay">Wochentag der bei einer angegebenen zahl ausgegeben werden soll</param>
+        /// <returns></returns>
+        private IEnumerable<DateTime> CalculateDatesWithoutWeekday(DateTime checkedStart, DateTime checkedEnd, DateTime current, int limit, int MonthDay, string targetDay = "")
         {
-            int count = 0;
+            int count = 0;//Counter für das Terminlimit
             while (current <= checkedEnd && count < limit)
             {
-                string dayOfWeekString = "";
-                string monthSaved = current.Month.ToString();
-                while (current.Month.ToString() == monthSaved)
+                while (current < checkedEnd)
                 {
-                    if (current.Day == MonthDay)
+                    DateTime lastDay = GetLastDayOfMonth(current);
+                    //UI.ConsoleWriter.LineColor($"{current.Day}.{current.Month}.{current.Year} ||| lastDay: {lastDay}", ConsoleColor.Red);
+                    if (current >= lastDay)
                     {
-                        if (current > checkedStart)
+                        if (MonthDay > 28)
+                        {
+                            count++;
+                            if (IsInRange(checkedStart, checkedEnd, current))
+                            {
+                                yield return current;
+                            }
+                        }
+                        break;
+                    }
+                    else if (current.Day == MonthDay)
+                    {
+                        count++;
+                        if (IsInRange(checkedStart, checkedEnd, current))
                         {
                             yield return current;
                         }
-                        else
-                        {
-                            UI.ConsoleWriter.LineColor($"|{current.ToString("dd.MM.yyyy")}| {current.DayOfWeek} OutOfRangeDate", ConsoleColor.DarkGray);
-                        }
-                        count++;
                         break;
                     }
+                    else
+                    {
+                        current = current.AddDays(1);
+                    };
+                }
+                current = current.AddMonths(1);
+                current = new DateTime(current.Year, current.Month, 1);
+            }
+        }
+
+        /// <summary>
+        /// Funktion zum berechnen von den Datums wenn ein Wochentag angegeben ist
+        /// </summary>
+        /// <param name="checkedStart">Start der anzuzeigenden Range</param>
+        /// <param name="checkedEnd">Ende der anzuzeigenden Range</param>
+        /// <param name="current">Das aktuelle datum welches genutzt wird zum durchskippen Tag für Tag</param>
+        /// <param name="limit">Maximales Limit für die anzahl an auszugebenden Datums</param>
+        /// <param name="MonthDay">Der wievielte angegebene Wochentag ausgegeben werden soll</param>
+        /// <param name="targetDay">Wochentag der bei einer angegebenen zahl ausgegeben werden soll</param>
+        /// <returns></returns>
+        private IEnumerable<DateTime> CalculateDatesWithWeekday(DateTime checkedStart, DateTime checkedEnd, DateTime current, int limit, int MonthDay, string targetDay = "")
+        {
+            int count = 0;//Counter für das Terminlimit
+            while (current <= checkedEnd && count < limit)
+            {
+                string monthSaved = current.Month.ToString();
+                int weekDayCount = 0;//Counter für die Wochentage 
+                while (current.Month.ToString() == monthSaved)
+                {
+                    if (current.DayOfWeek.ToString() == targetDay)
+                    {
+                        weekDayCount++;
+                        if (weekDayCount == MonthDay)
+                        {
+                            if (IsInRange(checkedStart, checkedEnd, current))
+                            {
+                                yield return current;
+                            }
+                            count++;
+                            break;
+                        }
+                    }
+                    current = current.AddDays(1);//Einen Tag hinzufügen zum Durchspulen des Monats
+                }
+                current = current.AddMonths(1);
+                current = new DateTime(current.Year, current.Month, 1); // Auf den ersten Tag des Monats setzen
+            }
+        }
+
+        /// <summary>
+        /// Funktion zum berechnen des letzten angegebenen Wochentages im Monat
+        /// </summary>
+        /// <param name="checkedStart">Start der anzuzeigenden Range</param>
+        /// <param name="checkedEnd">Ende der anzuzeigenden Range</param>
+        /// <param name="current">Das aktuelle datum welches genutzt wird zum durchskippen Tag für Tag</param>
+        /// <param name="limit">Maximales Limit für die anzahl an auszugebenden Datums</param>
+        /// <param name="MonthDay">Der wievielte angegebene Wochentag ausgegeben werden soll</param>
+        /// <param name="targetDay">Wochentag der bei einer angegebenen zahl ausgegeben werden soll</param>
+        /// <returns></returns>
+        private IEnumerable<DateTime> CalculateLastDatesWithWeekday(DateTime checkedStart, DateTime checkedEnd, DateTime current, int limit, int MonthDay, string targetDay = "")
+        {
+            int count = 0;//Counter für das Terminlimit
+            while (current <= checkedEnd && count < limit)
+            {
+                string monthSaved = current.Month.ToString();
+                int weekDayCount = 0;//Counter für die Wochentage 
+                while (current.Month.ToString() == monthSaved)
+                {
+                    current = current.AddMonths(1);
+                    current = new DateTime(current.Year, current.Month, 1);
+                    current = current.AddDays(-1);
+                    while (current.DayOfWeek.ToString() != targetDay)
+                    {
+                        current = current.AddDays(-1);
+                    }
+                    if (IsInRange(checkedStart, checkedEnd, current))
+                    {
+                        yield return current;
+                    }
+                    count++;
+                    current = current.AddMonths(1);
                 }
             }
+        }
+
+        private DateTime GetLastDayOfMonth(DateTime current)
+        {
+            current = current.AddMonths(1);
+            current = new DateTime(current.Year, current.Month, 1);
+            current = current.AddDays(-1);
+            return current;
+        }
+        private bool IsInRange(DateTime checkedStart, DateTime checkedEnd, DateTime current)
+        {
+            if (current >= checkedStart && current <= checkedEnd)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }//Die Berechnung von allem ist noch nicht perfekt, auch wenn die Titel von manchen commits anderes behaubten können. Vorallem Monthly ist gerade stark im Umbau. Viele fehler z.B. bei jeder 31 tag jeden monat existieren immernoch im Algorythmus. Jetzt wird das alles noch auf 2 einzelne Funktionen unterteilt. Der Code von vor der Teilung befindet sich darunter:
