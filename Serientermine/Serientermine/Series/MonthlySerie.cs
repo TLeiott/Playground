@@ -41,35 +41,35 @@ namespace Serientermine.Series
                 targetDay = day;
             }
 
-            if (DayList == null || DayList.Count == 0)
+            if (DayList == null || DayList.Count == 0)//WOchentag nich angegeben
             {
                 CalculateDatesWithWeekday(checkedStart, checkedEnd, current, Limit);
             }
             else//Wochentag angegeben
             {
             }
-            static void CalculateDatesWithWeekday(DateTime checkedStart, DateTime checkedEnd, DateTime current, int limit)
+        }
+        private IEnumerable<DateTime> CalculateDatesWithWeekday(DateTime checkedStart, DateTime checkedEnd, DateTime current, int limit)
+        {
+            int count = 0;
+            while (current <= checkedEnd && count < limit)
             {
-                int count = 0;
-                while (current <= checkedEnd && count < limit)
+                string dayOfWeekString = "";
+                string monthSaved = current.Month.ToString();
+                while (current.Month.ToString() == monthSaved)
                 {
-                    string dayOfWeekString = "";
-                    string monthSaved = current.Month.ToString();
-                    while (current.Month.ToString() == monthSaved)
+                    if (current.Day == MonthDay)
                     {
-                        if (current.Day == MonthDay)
+                        if (current > checkedStart)
                         {
-                            if (current > checkedStart)
-                            {
-                                yield return current;
-                            }
-                            else
-                            {
-                                UI.ConsoleWriter.LineColor($"|{current.ToString("dd.MM.yyyy")}| {current.DayOfWeek} OutOfRangeDate", ConsoleColor.DarkGray);
-                            }
-                            count++;
-                            break;
+                            yield return current;
                         }
+                        else
+                        {
+                            UI.ConsoleWriter.LineColor($"|{current.ToString("dd.MM.yyyy")}| {current.DayOfWeek} OutOfRangeDate", ConsoleColor.DarkGray);
+                        }
+                        count++;
+                        break;
                     }
                 }
             }
