@@ -29,13 +29,19 @@ namespace Serientermine.Series
             var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
             var current = Begin;
 
+            //Leeres Limit hochsetzen
+            if (Limit == 0)
+            {
+                Limit = 999999999;
+            }
+
             //auf den Letzten Montag zurückgehen um eine verschobene Wochenberechnung zu verhindern
             int daysUntilLastMonday = ((int)current.DayOfWeek - (int)DayOfWeek.Monday + 7) % 7;
             current = current.AddDays(-daysUntilLastMonday);
 
             int count = 0;//Counter für das Terminlimit
 
-            while (current <= checkedEnd&&count<Limit)//wenn im zeitraum
+            while (current <= checkedEnd && count < Limit)//wenn im zeitraum
             {
                 string dayOfWeekString = "";
                 string weekSaved = current.ToString();
@@ -55,7 +61,7 @@ namespace Serientermine.Series
                                 break;
                             }
                         }
-                        else if(count < Limit)
+                        else if (count < Limit)
                         {
                             dayOfWeekString = current.DayOfWeek.ToString();
                             if (dayOfWeekString == str)
@@ -64,8 +70,10 @@ namespace Serientermine.Series
                                 {
                                     yield return current;
                                 }
-                                count++;
-                                Console.WriteLine(count);
+                                if (current >= Begin)
+                                {
+                                    count++;
+                                }
                                 break;
                             }
                         }
@@ -80,4 +88,3 @@ namespace Serientermine.Series
         }
     }
 }
-//letzer Stand: Limit ist funktional wenn auch nicht ansehnlich. Macht einen Funktionierenden eindruck. Die serie früher als der Bereich zu starten funktionier dem anschein nach. Unitest allerdings immer output:null. Zu wenig erfahrung mit Unitest um das zu verstehen ->Nachfragen.
