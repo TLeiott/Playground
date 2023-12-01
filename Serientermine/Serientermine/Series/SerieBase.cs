@@ -22,13 +22,20 @@ namespace Serientermine.Series
         public abstract string IntervallDescription { get; }
 
         public int Limit { get; set; }
+        /// <summary>
+        /// "TagImMonat"=>Json
+        /// </summary>
         public int MonthDay { get; set; }
+        /// <summary>
+        /// "MonatImJahr"=>Json
+        /// </summary>
+        public int Month {  get; set; }
 
         public abstract IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end);
 
         protected (DateTime start, DateTime end) GetDatesForOutput(DateTime start, DateTime end)
         {
-            UI.ConsoleWriter.LineColor($"Limit(-;+): ({start}; {end}); Serienbereich(von;bis): ({Begin}; {End})", ConsoleColor.Red);
+            //UI.ConsoleWriter.LineColor($"Limit(-;+): ({start}; {end}); Serienbereich(von;bis): ({Begin}; {End})", ConsoleColor.Red);
             if (Begin > start)
             {
                 start = Begin;
@@ -37,8 +44,8 @@ namespace Serientermine.Series
             {
                 end = End.Value;
             }
-            UI.ConsoleWriter.LineColor($"Überarbeitet:(-;+): ({start}; {end})", ConsoleColor.Red);
-            UI.ConsoleWriter.LineColor($"-----------------------------------------------------", ConsoleColor.Red);
+            //UI.ConsoleWriter.LineColor($"Überarbeitet:(-;+): ({start}; {end})", ConsoleColor.Red);
+            //UI.ConsoleWriter.LineColor($"-----------------------------------------------------", ConsoleColor.Red);
             return (start, end);
         }
     }

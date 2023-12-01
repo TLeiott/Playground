@@ -20,7 +20,7 @@ namespace Serientermine
             try
             {
                 var rangeStart = new DateTime(2023, 12, 1);
-                var rangeEnd = new DateTime(2024, 3, 31);
+                var rangeEnd = new DateTime(2025, 12, 31);
                 host.Start();
 
                 var series = GetSeries(host);
@@ -77,7 +77,11 @@ namespace Serientermine
                         };
                         break;
                     case "Yearly":
-                        continue;
+                        serie = new YearlySerie
+                        {
+                            DayList = GetDayList(child.GetValue<string>("Wochentage"))
+                        };
+                        break;
                     default:                        
                         throw new NotSupportedException($"Der Serientyp '{type}' ist noch nicht implementiert.");
                 }
@@ -88,6 +92,7 @@ namespace Serientermine
                 serie.Begin = (DateTime)child.GetDateTime("Begin");
                 serie.End = child.GetDateTime("end");
                 serie.MonthDay = child.GetValue<int>("TagImMonat");
+                serie.Month = child.GetValue<int>("MonatImJahr");
 
                 list.Add(serie);
 
