@@ -35,55 +35,30 @@ namespace Serientermine.Series
                 Limit = 999999999;
             }
 
-            int count = 0;//Counter für das Terminlimit
-
-            if (dayList.Count <= 0)
+            //Leeres dayList hochsetzen
+            if (dayList.Count == 0)
             {
-                while (current <= checkedEnd && count < Limit)
+                for (int i = 0; i < 7; i++)
                 {
-                    if (IsInRange(checkedStart, checkedEnd, current))
-                    {
-                        yield return current;
-                    }
-                    count++;
-                    current = current.AddDays(intervall);
+                    dayList.Add(current.DayOfWeek.ToString());
+                    current = current.AddDays(1);
                 }
             }
-            else
+            current = Begin;
+
+            int count = 0;//Counter für das Terminlimit
+
+            while (current <= checkedEnd && count < Limit)//wenn im zeitraum
             {
-                string dayOfWeekString = "";
-                while (current <= checkedEnd && count < Limit)//wenn im zeitraum
+                if (IsInRange(checkedStart, checkedEnd, current) && dayList.Contains(current.DayOfWeek.ToString()))
                 {
-                    foreach (string str in dayList)
-                    {
-                        if (int.TryParse(str, out int dayDate)) // für jedes TagesDatum in der Liste
-                        {
-                            if (current.Day == dayDate)
-                            {
-                                if (IsInRange(checkedStart, checkedEnd, current))
-                                {
-                                    yield return current;
-                                }
-                                count++;
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            dayOfWeekString = current.DayOfWeek.ToString();
-                            if (dayOfWeekString == str)
-                            {
-                                if (IsInRange(checkedStart, checkedEnd, current))
-                                {
-                                    yield return current;
-                                }
-                                count++;
-                                break;
-                            }
-                        }
-                    }
-                    current = current.AddDays(intervall);// Tag
+                    yield return current;
                 }
+                if (dayList.Contains(current.DayOfWeek.ToString()))
+                {
+                    count++;
+                }
+                current = current.AddDays(intervall);// Tag
             }
         }
         private bool IsInRange(DateTime checkedStart, DateTime checkedEnd, DateTime current)
@@ -96,4 +71,4 @@ namespace Serientermine.Series
         }
     }
 }
-//Daily sollte neu geschrieben werden wie der versuch limit zu integrieren gezeigt hat. In der aktuellen version von Daily sind noch funktionen drinnen, die nicht gebraucht werden. Beim neuschreiben muss sich dieses mal an den Kalender gehalten werden.    
+//Daily sollte neu geschrieben werden, wie der versuch limit zu integrieren gezeigt hat. In der aktuellen version von Daily sind noch funktionen drinnen, die nicht gebraucht werden. Beim neuschreiben muss sich dieses mal an den Kalender gehalten werden.    
