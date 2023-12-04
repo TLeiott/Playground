@@ -44,6 +44,7 @@ namespace Serientermine.Series
             //Startdatum definieren
             var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
             var current = Begin;
+            current = GetCorrectStartdate(checkedStart);
 
             //Leeres Limit hochsetzen
             if (Limit == 0)
@@ -189,8 +190,8 @@ namespace Serientermine.Series
             int count = 0;//Counter für das Terminlimit
             while (current <= checkedEnd && count < limit)
             {
-            current = new DateTime(current.Year, Month, 1);
-            current = new DateTime(current.Year, Month, GetLastDayOfMonth(current).Day);
+                current = new DateTime(current.Year, Month, 1);
+                current = new DateTime(current.Year, Month, GetLastDayOfMonth(current).Day);
                 while (current.DayOfWeek.ToString() != targetDay)
                 {
                     current = current.AddDays(-1);
@@ -220,7 +221,49 @@ namespace Serientermine.Series
             }
             return false;
         }
-        //private void SwitchToTargetMonth(DateTime current, )
+        private DateTime GetTargetDay(DateTime current)
+        {
+            current = current = new DateTime(current.Year, Month, 1);
+            if (DayList == null || DayList.Count == 0)//Wochentag nich angegeben
+            {
+                if (MonthDay > 28)
+                {
+                    current = GetLastDayOfMonth(current);
+                    while (current.Day != MonthDay)
+                    {
+                        current = current.AddDays(-1);
+                    }
+                    return current;
+                }
+            }
+            else//Wochentag angegeben
+            {
+                if (MonthDay < 5)
+                {
+                    current = current = new DateTime(current.Year, Month, MonthDay);
+                    return current;
+                }
+                else
+                {
+                    current = GetLastDayOfMonth(current);
+                    return current;
+                }
+
+            }
+            return current;
+        }
+        private DateTime GetCorrectStartdate(DateTime current)
+        {
+            if (current > GetTargetDay(current))
+            {
+                current = new DateTime(current.Year + 1, Month, 1);
+            }
+            else
+            {
+                current = new DateTime(current.Year, Month, 1);
+            }
+            return current;
+        }
         //Ohne Wochentag und Mit letzem wochentag funktioniert schon, nur das innerhalb des Startjahres zurückgesprungen wird. Um dies zu fixen muss die Obere Funktion fertig gestellt werden. Ronny wegen Unitest ansprechen.
     }
 }
