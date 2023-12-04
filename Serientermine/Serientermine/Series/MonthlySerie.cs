@@ -120,7 +120,7 @@ namespace Serientermine.Series
                         current = current.AddDays(1);
                     };
                 }
-                current = current.AddMonths(1);
+                current = current.AddMonths(Intervall);
                 current = new DateTime(current.Year, current.Month, 1);
             }
         }
@@ -159,7 +159,7 @@ namespace Serientermine.Series
                     }
                     current = current.AddDays(1);//Einen Tag hinzufügen zum Durchspulen des Monats
                 }
-                current = current.AddMonths(1);
+                current = current.AddMonths(Intervall);
                 current = new DateTime(current.Year, current.Month, 1); // Auf den ersten Tag des Monats setzen
             }
         }
@@ -195,7 +195,7 @@ namespace Serientermine.Series
                         yield return current;
                     }
                     count++;
-                    current = current.AddMonths(1);
+                    current = current.AddMonths(Intervall);
                 }
             }
         }

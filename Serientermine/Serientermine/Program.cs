@@ -19,8 +19,8 @@ namespace Serientermine
             var host = Host.CreateDefaultBuilder(args).Build();
             try
             {
-                var rangeStart = new DateTime(2021, 1, 6);
-                var rangeEnd = new DateTime(2021, 2, 10);
+                var rangeStart = new DateTime(2022, 1, 1);
+                var rangeEnd = new DateTime(2024, 12, 31);
                 host.Start();
 
                 var series = GetSeries(host);
