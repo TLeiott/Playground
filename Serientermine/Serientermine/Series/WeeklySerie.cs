@@ -22,8 +22,7 @@ namespace Serientermine.Series
             if (DayList == null || DayList.Count == 0)
                 yield break;
             List<string> dayList = DayList;
-            int intervall = Intervall;
-            Console.WriteLine();
+            int intervall = Intervall;  
 
             //Startdatum definieren
             var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
@@ -53,10 +52,8 @@ namespace Serientermine.Series
                         {
                             if (current.Day == dayDate)
                             {
-                                if (current >= checkedStart)
-                                {
+                                if (current >= checkedStart && IsInRange(checkedStart, checkedEnd, current))
                                     yield return current;
-                                }
                                 count++;
                                 break;
                             }
@@ -66,14 +63,12 @@ namespace Serientermine.Series
                             dayOfWeekString = current.DayOfWeek.ToString();
                             if (dayOfWeekString == str)
                             {
-                                if (current >= checkedStart)
-                                {
+                                if (current >= checkedStart && IsInRange(checkedStart, checkedEnd, current))
                                     yield return current;
-                                }
+
                                 if (current >= Begin)
-                                {
                                     count++;
-                                }
+
                                 break;
                             }
                         }
@@ -84,7 +79,14 @@ namespace Serientermine.Series
                 current = current.AddDays(-7);
                 current = current.AddDays(7 * intervall);
             }
-
+        }
+        private bool IsInRange(DateTime checkedStart, DateTime checkedEnd, DateTime current)
+        {
+            if (current >= checkedStart && current <= checkedEnd)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
