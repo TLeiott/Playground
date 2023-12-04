@@ -16,7 +16,7 @@ namespace Serientermine.Series
     /// </summary>
     public sealed class MonthlySerie : SerieBase
     {
-        public List<string> DayList { get; set; }
+        public List<string> DayList { get; set; } = new();
 
         public override SerieType Type => SerieType.Monthly;
 
