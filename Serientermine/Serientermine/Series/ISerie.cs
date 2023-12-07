@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Serientermine.Series
 {
@@ -39,7 +36,7 @@ namespace Serientermine.Series
         string IntervallDescription { get; }
 
         /// <summary>
-        /// Das Maximaledatum
+        /// Anzahl der Wiederholungen, 0 = keine Begrenzung der Wiederholungen
         /// </summary>
         int Limit { get; }
 

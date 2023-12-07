@@ -1,13 +1,5 @@
-﻿using Serientermine.Serientermine;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Serientermine.Series
 {
@@ -25,12 +17,13 @@ namespace Serientermine.Series
         /// <inheritdoc cref="ISerie.GetDatesInRange(DateTime, DateTime)"/>
         public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end)
         {
+
             //leere angaben bei "TagImMonat" herausfiltern
             if (MonthDay == 0)
                 yield break;
 
             //mehrere angaben bei "Wochentage" herausfiltern
-            if (DayList.Count > 1)
+            if (DayList.Count > 1||DayList==null)
                 yield break;
 
             //Zu hohe angaben bei Tag im Monat wenn kein Wochentag gegeben
@@ -96,7 +89,7 @@ namespace Serientermine.Series
         {
             current = new DateTime(current.Year, Month, 1);
             int count = 0;//Counter für das Terminlimit
-            while (current <= checkedEnd && count < limit)
+            while (current <= checkedEnd && (count < Limit || Limit == 0))
             {
                 while (current < checkedEnd)
                 {
@@ -148,7 +141,7 @@ namespace Serientermine.Series
         private IEnumerable<DateTime> CalculateDatesWithWeekday(DateTime checkedStart, DateTime checkedEnd, DateTime current, int limit, int MonthDay, string targetDay = "")
         {
             int count = 0;//Counter für das Terminlimit
-            while (current <= checkedEnd && count < limit)
+            while (current <= checkedEnd && (count < Limit || Limit == 0))
             {
                 current = new DateTime(current.Year, Month, 1);
                 string monthSaved = current.Month.ToString();
@@ -188,7 +181,7 @@ namespace Serientermine.Series
         private IEnumerable<DateTime> CalculateLastDatesWithWeekday(DateTime checkedStart, DateTime checkedEnd, DateTime current, int limit, int MonthDay, string targetDay = "")
         {
             int count = 0;//Counter für das Terminlimit
-            while (current <= checkedEnd && count < limit)
+            while (current <= checkedEnd && (count < Limit || Limit == 0))
             {
                 current = new DateTime(current.Year, Month, 1);
                 current = new DateTime(current.Year, Month, GetLastDayOfMonth(current).Day);

@@ -1,13 +1,5 @@
-﻿using Serientermine.Serientermine;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Serientermine.Series
 {
@@ -38,12 +30,6 @@ namespace Serientermine.Series
             //Startdatum definieren
             var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
             var current = Begin;
-
-            //Leeres Limit hochsetzen
-            if (Limit == 0)
-            {
-                Limit = 999999999;
-            }
 
             string targetDay = "";
             foreach (var day in dayList)
@@ -88,7 +74,7 @@ namespace Serientermine.Series
         private IEnumerable<DateTime> CalculateDatesWithoutWeekday(DateTime checkedStart, DateTime checkedEnd, DateTime current, int limit, int MonthDay, string targetDay = "")
         {
             int count = 0;//Counter für das Terminlimit
-            while (current <= checkedEnd && count < limit)
+            while (current <= checkedEnd && (count < Limit || Limit == 0))
             {
                 while (current < checkedEnd)
                 {
@@ -138,7 +124,7 @@ namespace Serientermine.Series
         private IEnumerable<DateTime> CalculateDatesWithWeekday(DateTime checkedStart, DateTime checkedEnd, DateTime current, int limit, int MonthDay, string targetDay = "")
         {
             int count = 0;//Counter für das Terminlimit
-            while (current <= checkedEnd && count < limit)
+            while (current <= checkedEnd && (count < Limit || Limit == 0))
             {
                 string monthSaved = current.Month.ToString();
                 int weekDayCount = 0;//Counter für die Wochentage 
@@ -177,7 +163,7 @@ namespace Serientermine.Series
         private IEnumerable<DateTime> CalculateLastDatesWithWeekday(DateTime checkedStart, DateTime checkedEnd, DateTime current, int limit, int MonthDay, string targetDay = "")
         {
             int count = 0;//Counter für das Terminlimit
-            while (current <= checkedEnd && count < limit)
+            while (current <= checkedEnd && (count < Limit || Limit == 0))
             {
                 string monthSaved = current.Month.ToString();
                 int weekDayCount = 0;//Counter für die Wochentage 
