@@ -44,12 +44,10 @@ namespace Serientermine.Series
 
             var count = 0;//Counter für das Terminlimit
 
-            // BUG: Das Limit muss im Zweifel um die bereits stattgefundenen Termine reduziert werden
             while (current <= checkedEnd && (count < Limit || Limit == 0))//wenn im zeitraum
             {
                 for (var i = 0; i < 7; i++)
                 {
-                    // BUG: Du grast hier zwar alle möglichen Tage ab, brichst dann aber nach dem ersten Treffer ab
                     foreach (var weekday in dayList) //für jeden Tag in der Liste
                     {
                         if (count >= Limit && Limit != 0)
@@ -70,8 +68,9 @@ namespace Serientermine.Series
                     current = current.AddDays(1);//+1 Tag
                 }
 
-                current = current.AddDays(-7);
-                current = current.AddDays(7 * intervall);
+                current = current
+                    .AddDays(-7)
+                    .AddDays(7 * intervall);
 
                 // Alternative:
                 //if (intervall > 1) 

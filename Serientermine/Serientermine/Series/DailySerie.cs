@@ -15,18 +15,28 @@ namespace Serientermine.Series
         /// <inheritdoc />
         public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end)
         {
+            //DEBUGING
+            DateTime debug_startTime = DateTime.Now;
+
             var intervall = Intervall;
 
             // Startdatum festlegen
             var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
             var current = checkedStart;
             current = Begin;
+            var count = 0;
 
-            var count = 0;//Counter für das Terminlimit
+            TimeSpan difference = checkedStart - Begin;
+            int gap = (int)Math.Floor(difference.Days / (double)intervall);
+            current=current.AddDays(gap*Intervall);
+            count = gap;
+
+            //DEBUGING
+            DateTime debug_stepTime = DateTime.Now;
 
             while (current <= checkedEnd && (count < Limit || Limit == 0)) //wenn im zeitraum
             {
-                if (IsInRange(checkedStart, checkedEnd, current))
+               if (IsInRange(checkedStart, checkedEnd, current))
                 {
                     yield return current;
                 }
@@ -39,4 +49,3 @@ namespace Serientermine.Series
             => current >= checkedStart && current <= checkedEnd;
     }
 }
-//Daily sollte neu geschrieben werden, wie der versuch limit zu integrieren gezeigt hat. In der aktuellen version von Daily sind noch funktionen drinnen, die nicht gebraucht werden. Beim neuschreiben muss sich dieses mal an den Kalender gehalten werden.    
