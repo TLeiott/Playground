@@ -19,8 +19,8 @@ namespace Serientermine
             var host = Host.CreateDefaultBuilder(args).Build();
             try
             {
-                var rangeStart = new DateTime(2022, 1, 1);
-                var rangeEnd = new DateTime(2024, 12, 31);
+                var rangeStart = new DateTime(2021, 1, 5);
+                var rangeEnd = new DateTime(2021, 1, 11);
                 host.Start();
 
                 var series = GetSeries(host);
@@ -55,14 +55,10 @@ namespace Serientermine
             {
                 SerieBase serie;
                 var type = child.GetValue<string>("Type");
-
                 switch (type)
                 {
                     case "Daily":
-                        serie = new DailySerie
-                        {
-                            DayList = GetDayList(child.GetValue<string>("Wochentage"))
-                        };
+                        serie = new DailySerie();
                         break;
                     case "Weekly":
                         serie = new WeeklySerie

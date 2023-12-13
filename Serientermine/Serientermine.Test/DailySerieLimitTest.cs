@@ -1,9 +1,13 @@
-
-using Serientermine.Series;
+﻿using Serientermine.Series;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Serientermine.Test
 {
-    public class DailySerieTest
+    internal class DailySerieLimitTest
     {
         private DailySerie? _serie;
 
@@ -14,7 +18,8 @@ namespace Serientermine.Test
             {
                 Begin = new DateTime(2021, 1, 1),
                 End = new DateTime(2021, 1, 31),
-                Intervall = 3
+                Intervall = 3,
+                Limit = 3
             };
         }
 
@@ -22,7 +27,7 @@ namespace Serientermine.Test
         public void TestWithinRange()
         {
             var actual = _serie!.GetDatesInRange(new DateTime(2021, 1, 5), new DateTime(2021, 1, 11)).ToList();
-            var expected = new List<DateTime> { new(2021, 1, 7), new(2021, 1, 10) };
+            var expected = new List<DateTime> { new(2021, 1, 7) };
             Assert.That(actual, Is.EquivalentTo(expected));
         }
 
@@ -52,8 +57,7 @@ namespace Serientermine.Test
         public void TestEndWithinRange()
         {
             var actual = _serie!.GetDatesInRange(new DateTime(2021, 1, 26), new DateTime(2021, 2, 5)).ToList();
-            var expected = new List<DateTime> { new(2021, 1, 28), new(2021, 1, 31) };
-            Assert.That(actual, Is.EquivalentTo(expected));
+            Assert.That(actual, Is.EquivalentTo(Array.Empty<DateTime>()));
         }
     }
 }
