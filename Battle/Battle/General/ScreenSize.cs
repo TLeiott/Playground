@@ -23,7 +23,9 @@ namespace Battle.General
             Console.SetWindowPosition(0, 0);
             Console.SetCursorPosition(100, 32);
 
-            //UI.ConsoleWriter.Slow("Rescale it to your prefered size. Press any button when you are done...", 0, ConsoleColor.Cyan);
+            UI.ConsoleWriter.Color("Rescale it to your prefered size. Press any button when you are done...", ConsoleColor.Cyan);
+            Console.Read();
+            Console.Clear();
         }
         private static void WriteVertical(int count, string text, ConsoleColor color) 
         {

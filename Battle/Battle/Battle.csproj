@@ -8,10 +8,11 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Battle</RootNamespace>
     <AssemblyName>Battle</AssemblyName>
-    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -43,6 +44,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Inventory\IdGenerator.cs" />
+    <Compile Include="Inventory\Item.cs" />
+    <Compile Include="Inventory\ItemDatabase.cs" />
+    <Compile Include="Present\CheckToGenerate.cs" />
+    <Compile Include="Present\OpenPresent.cs" />
+    <Compile Include="Present\PresentIsPresent.cs" />
+    <Compile Include="UI\DisplayImage.cs" />
     <Compile Include="UI\ConsoleWriter.cs" />
     <Compile Include="General\ScreenSize.cs" />
     <Compile Include="Program.cs" />

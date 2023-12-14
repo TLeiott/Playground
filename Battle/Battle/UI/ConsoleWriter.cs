@@ -65,8 +65,8 @@ namespace Battle.UI//change here to merge
             for (int i = 0; i < message.Length; ++i)
             {
                 Console.Write(message[i]);
-                if (message[i] == ' ') { Thread.Sleep(speed * 2); }
-                if (message[i] == '.') { Thread.Sleep(speed * 3); }
+                if (message[i] == ' ') { Thread.Sleep(speed); }
+                if (message[i] == '.') { Thread.Sleep(speed * 2); }
                 Thread.Sleep((speed / 2) + random.Next(0, 150));
             }
             //Default farben wieder anwenden
