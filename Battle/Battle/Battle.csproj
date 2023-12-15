@@ -50,6 +50,7 @@
     <Compile Include="Present\CheckToGenerate.cs" />
     <Compile Include="Present\OpenPresent.cs" />
     <Compile Include="Present\PresentIsPresent.cs" />
+    <Compile Include="UI\ClearField.cs" />
     <Compile Include="UI\DisplayImage.cs" />
     <Compile Include="UI\ConsoleWriter.cs" />
     <Compile Include="General\ScreenSize.cs" />

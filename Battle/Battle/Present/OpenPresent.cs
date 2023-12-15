@@ -10,8 +10,7 @@ namespace Battle.Present
     {
         public static bool Open()
         {
-            Console.Clear();
-            UI.DisplayImage.General(0, 0);
+            UI.ClearField.ClearPresent();
             return false;
         }
     }
