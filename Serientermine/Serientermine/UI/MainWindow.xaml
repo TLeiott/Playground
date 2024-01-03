@@ -1,5 +1,5 @@
 ﻿<!-- BUG: Die anzeige des Monats am slider verschwindet nachdem sie deaktiviert wird dur dayly oder weekly und kommt nicht wieder -->
-    <hmd:HmdWindow x:Class="Serientermine.UI.MainWindow"
+<hmd:HmdWindow x:Class="Serientermine.UI.MainWindow"
                xmlns:hmd="http://schemas.hmd-software.com/winfx/xaml/controls"
                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -49,57 +49,53 @@
                        Text="Betrachtungszeitraum"
                        Style="{StaticResource GroupTitleTextBlockStyle}"
                        Grid.ColumnSpan="2" />
-            
+
             <hmd:LabelContentControl Grid.Row="1"
                                      LabelText="Start"
-                                     IsRequired="True"
-                                     Name="StartDateLabel">
-                <DatePicker SelectedDate="{Binding Start, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
-                            Name="StartDatePicker"/>
+                                     IsRequired="True">
+                <DatePicker SelectedDate="{Binding RangeStart}"/>
             </hmd:LabelContentControl>
-            
+
             <hmd:LabelContentControl Grid.Row="1"
                                      Grid.Column="1"
-                                     LabelText="Ende">
-                <DatePicker Name="EndDatePicker"/>
+                                     LabelText="Ende"
+                                     IsRequired="True">
+                <DatePicker SelectedDate="{Binding RangeEnd}"/>
             </hmd:LabelContentControl>
-             
+
             <TextBlock Grid.Row="2"
                        Text="Serieneigenschaften"
                        Style="{StaticResource GroupTitleTextBlockStyle}"
                        Grid.ColumnSpan="2" />
 
             <hmd:LabelContentControl Grid.Row="3"
-                                     LabelText="Serientyp">
+                                     LabelText="Serientyp"
+                                     IsRequired="True">
+                <ComboBox IsEditable="false" 
+                          SelectedValue="{Binding SelectedSerieType}" SelectedValuePath="Content">
+                    <ComboBoxItem Content="Täglich" />
+                    <ComboBoxItem Content="Wöchentlich" />
+                    <ComboBoxItem Content="Monatlich" />
+                    <ComboBoxItem Content="Jährlich" />
+                </ComboBox>
             </hmd:LabelContentControl>
             <hmd:LabelContentControl Grid.Row="3"
                                      Grid.Column="1"
-                                     LabelText="Wochentag">
+                                     LabelText="Wochentag"
+                                     Visibility="{Binding IsWeekdayEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ComboBox IsEditable="false"
+                          IsEnabled="{Binding IsWeekdayEnabled}">
+                    <ComboBoxItem Content="Montag" />
+                    <ComboBoxItem Content="Dienstag" />
+                    <ComboBoxItem Content="Mittwoch" />
+                    <ComboBoxItem Content="Donnerstag" />
+                    <ComboBoxItem Content="Freitag" />
+                    <ComboBoxItem Content="Samstag" />
+                    <ComboBoxItem Content="Sonntag" />
+                </ComboBox>
             </hmd:LabelContentControl>
 
-            <ComboBox Grid.Row="4"
-                      Name="SerieTypeComboBox"
-                      IsEditable="false"
-                      SelectionChanged="SerieTypeComboBox_SelectionChanged">
-                <ComboBoxItem Content="Täglich" />
-                <ComboBoxItem Content="Wöchentlich" />
-                <ComboBoxItem Content="Monatlich" />
-                <ComboBoxItem Content="Jährlich" />
-            </ComboBox>
 
-            <ComboBox Grid.Row="4"
-                      Name="WeekDayComboBox"
-                      IsEditable="false"
-                      IsEnabled="True"
-                      Grid.Column="1">
-                <ComboBoxItem Content="Montag" />
-                <ComboBoxItem Content="Dienstag" />
-                <ComboBoxItem Content="Mittwoch" />
-                <ComboBoxItem Content="Donnerstag" />
-                <ComboBoxItem Content="Freitag" />
-                <ComboBoxItem Content="Samstag" />
-                <ComboBoxItem Content="Sonntag" />
-            </ComboBox>
 
             <hmd:LabelContentControl Grid.Row="5"
                                      LabelText="Monat">
@@ -107,33 +103,29 @@
             <hmd:LabelContentControl Grid.Row="5"
                                      Grid.Column="1"
                                      LabelText="Limit">
+                <TextBox PreviewTextInput="NumericTextBox_PreviewTextInput" />
             </hmd:LabelContentControl>
 
-            <TextBox Grid.Row="6"
-                     x:Name="numberTextBoxLimit"
-                     Grid.Column="1"
-                     PreviewTextInput="NumericTextBox_PreviewTextInput" />
 
             <Grid Grid.Row="6"
-                  Grid.Column="0"
-                  Grid.ColumnSpan="1">
+                  Grid.Column="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20*" />
-                    <ColumnDefinition Width="78*" />
-                    <ColumnDefinition Width="02*" />
+                    <ColumnDefinition Width="Auto" MinWidth="70" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <!-- TextBlock für die Anzeige des ausgewählten Monats -->
 
-                <TextBlock Name="MonatsAnzeige"
+                <TextBlock 
                            Grid.Column="0"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Left"
                            Margin="10,0,0,0"
-                           Text="{Binding ElementName=monthSlider, Path=Value, Converter= {x:Static  converters:MonthConverter.Instance}, ConverterParameter=500}" />
+                           Text="{Binding ElementName=MonthSlider, Path=Value, Converter= {x:Static converters:MonthConverter.Instance}}" />
 
                 <!-- Slider-->
-                <Slider Grid.Column="1"
-                        Name="monthSlider"
+                <Slider x:Name="MonthSlider"
+                        Grid.Column="1"
+                        Margin="6,4,10,4"
                         IsEnabled="True"
                         Minimum="1"
                         Maximum="12"
@@ -147,53 +139,48 @@
             <hmd:LabelContentControl Grid.Row="7"
                                      Grid.Column="1"
                                      LabelText="Intervall">
+                <TextBox PreviewTextInput="NumericTextBox_PreviewTextInput"  />
             </hmd:LabelContentControl>
-            
+
             <hmd:LabelContentControl Grid.Row="7"
                                      Grid.Column="0"
                                      LabelText="Tag des Monats">
+            <TextBox PreviewTextInput="NumericTextBox_PreviewTextInput" />
             </hmd:LabelContentControl>
 
-            <TextBox Grid.Row="8"
-                     x:Name="numberTextBoxIntervall"
-                     Grid.Column="1"
-                     PreviewTextInput="NumericTextBox_PreviewTextInput"  />
-            
-            <TextBox Grid.Row="8"
-                     x:Name="numberTextDayOfMonth"
-                     Grid.Column="0"
-                     PreviewTextInput="NumericTextBox_PreviewTextInput" />
+
 
             <Button Grid.Row="9"
                     Content="Berechnen"
-                    Click="ButtonClick"
+                    Command="{Binding CalcCommand}"
                     HorizontalAlignment="Left"
-                    Style="{StaticResource PrimaryButtonStyle}" 
-                    />
+                    Style="{StaticResource PrimaryButtonStyle}" />
 
         </Grid>
-        <DataGrid x:Name="DateGrid"
-                  Grid.Column="1"
-                  CanUserResizeColumns="True"
-                  SelectionMode="Extended">
+        <DataGrid Grid.Column="1"
+                  ItemsSource="{Binding CalculatedDates}"
+                  CanUserResizeColumns="True" 
+                  AlternationCount="{ Binding CalculatedDates.Count}"
+                  EnableRowVirtualization="False">
             <!--HeadersVisibility="Column"-->
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Nummer"
-                                    Binding="{Binding Number, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                                    Width="25*"
+                <DataGridTemplateColumn
+                    Header="Nr"
+                    HeaderStyle="{StaticResource DataGridColumnHeaderRightAlign}"
+                    CellStyle="{StaticResource DataGridCellRightAlign}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=(ItemsControl.AlternationIndex),
+                 RelativeSource={RelativeSource AncestorType=DataGridRow}}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Datum"
+                                    Binding="{Binding Date, StringFormat=d}"
+                                    Width="80"
                                     HeaderStyle="{StaticResource DataGridColumnHeaderRightAlign}"
                                     CellStyle="{StaticResource DataGridCellRightAlign}" />
-                <DataGridTextColumn Header="Datum"
-                                    Binding="{Binding Date, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat={}{0:dd.MM.yyyy}}"
-                                    Width="75*" />
             </DataGrid.Columns>
-            <DataGrid.RowHeaderTemplate>
-                <DataTemplate>
-                    <TextBlock Width="20"
-                               Text="{Binding DataContext.Id, RelativeSource={RelativeSource AncestorType=DataGridRow}}"
-                               TextAlignment="Center" />
-                </DataTemplate>
-            </DataGrid.RowHeaderTemplate>
         </DataGrid>
         <!--<ItemsControl Grid.Column="1" Background="Gainsboro" />-->
     </Grid>
