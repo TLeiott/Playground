@@ -1,17 +1,47 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Hmd.Core.UI.Builders;
+using Hmd.Environments;
+using Hmd.Environments.Builders;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serientermine.Providers;
 using Serientermine.Series;
+using Serientermine.UI;
+using Serientermine.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
+using ConsoleWriter = Serientermine.Providers.ConsoleWriter;
 
 namespace Serientermine
 {
     internal class Program
     {
-        static void Main(string[] args)
+        [STAThread]
+        private static int Main(string[] args)
+        {
+            try
+            {
+                return HmdApplication
+                    .InitializeApplication(args, new HmdApplicationConfiguration()
+                    {
+                        
+                    })
+                    .RunWithCoreUi((environments, provider) =>
+                    {
+                        return environments.RunAsWindow(() => new MainWindow { DataContext = new MainViewModel() });
+                    });
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+                return HmdAppDefaults.RETURNCODE_ERROR;
+            }
+
+        }
+
+        private static void MainStartConsole(string[] args)
         {
             List<string> errorLog = new List<string>();
             Console.CursorVisible = false;

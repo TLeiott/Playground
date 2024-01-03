@@ -1,0 +1,200 @@
+﻿<!-- BUG: Die anzeige des Monats am slider verschwindet nachdem sie deaktiviert wird dur dayly oder weekly und kommt nicht wieder -->
+    <hmd:HmdWindow x:Class="Serientermine.UI.MainWindow"
+               xmlns:hmd="http://schemas.hmd-software.com/winfx/xaml/controls"
+               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+               xmlns:local="clr-namespace:Serientermine.UI"
+               xmlns:viewModels="clr-namespace:Serientermine.ViewModels"
+               xmlns:converters="clr-namespace:Serientermine.Converters"
+               mc:Ignorable="d"
+               d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
+               Title="Mein erstes Fenster"
+               Height="450"
+               Width="800"
+               ApplicationName="azubi">
+    <!--<Window.Resources>
+        <ResourceDictionary>
+            <converters:MonthConverter x:Key="MonthConverter" ZeroValue = 100/>
+        </ResourceDictionary>
+
+    </Window.Resources>-->
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="70*" />
+            <ColumnDefinition Width="30*" />
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+
+
+            <TextBlock Grid.Row="0"
+                       Text="Betrachtungszeitraum"
+                       Style="{StaticResource GroupTitleTextBlockStyle}"
+                       Grid.ColumnSpan="2" />
+            
+            <hmd:LabelContentControl Grid.Row="1"
+                                     LabelText="Start"
+                                     IsRequired="True"
+                                     Name="StartDateLabel">
+                <DatePicker SelectedDate="{Binding Start, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
+                            Name="StartDatePicker"/>
+            </hmd:LabelContentControl>
+            
+            <hmd:LabelContentControl Grid.Row="1"
+                                     Grid.Column="1"
+                                     LabelText="Ende">
+                <DatePicker Name="EndDatePicker"/>
+            </hmd:LabelContentControl>
+             
+            <TextBlock Grid.Row="2"
+                       Text="Serieneigenschaften"
+                       Style="{StaticResource GroupTitleTextBlockStyle}"
+                       Grid.ColumnSpan="2" />
+
+            <hmd:LabelContentControl Grid.Row="3"
+                                     LabelText="Serientyp">
+            </hmd:LabelContentControl>
+            <hmd:LabelContentControl Grid.Row="3"
+                                     Grid.Column="1"
+                                     LabelText="Wochentag">
+            </hmd:LabelContentControl>
+
+            <ComboBox Grid.Row="4"
+                      Name="SerieTypeComboBox"
+                      IsEditable="false"
+                      SelectionChanged="SerieTypeComboBox_SelectionChanged">
+                <ComboBoxItem Content="Täglich" />
+                <ComboBoxItem Content="Wöchentlich" />
+                <ComboBoxItem Content="Monatlich" />
+                <ComboBoxItem Content="Jährlich" />
+            </ComboBox>
+
+            <ComboBox Grid.Row="4"
+                      Name="WeekDayComboBox"
+                      IsEditable="false"
+                      IsEnabled="True"
+                      Grid.Column="1">
+                <ComboBoxItem Content="Montag" />
+                <ComboBoxItem Content="Dienstag" />
+                <ComboBoxItem Content="Mittwoch" />
+                <ComboBoxItem Content="Donnerstag" />
+                <ComboBoxItem Content="Freitag" />
+                <ComboBoxItem Content="Samstag" />
+                <ComboBoxItem Content="Sonntag" />
+            </ComboBox>
+
+            <hmd:LabelContentControl Grid.Row="5"
+                                     LabelText="Monat">
+            </hmd:LabelContentControl>
+            <hmd:LabelContentControl Grid.Row="5"
+                                     Grid.Column="1"
+                                     LabelText="Limit">
+            </hmd:LabelContentControl>
+
+            <TextBox Grid.Row="6"
+                     x:Name="numberTextBoxLimit"
+                     Grid.Column="1"
+                     PreviewTextInput="NumericTextBox_PreviewTextInput" />
+
+            <Grid Grid.Row="6"
+                  Grid.Column="0"
+                  Grid.ColumnSpan="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20*" />
+                    <ColumnDefinition Width="78*" />
+                    <ColumnDefinition Width="02*" />
+                </Grid.ColumnDefinitions>
+                <!-- TextBlock für die Anzeige des ausgewählten Monats -->
+
+                <TextBlock Name="MonatsAnzeige"
+                           Grid.Column="0"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left"
+                           Margin="10,0,0,0"
+                           Text="{Binding ElementName=monthSlider, Path=Value, Converter= {x:Static  converters:MonthConverter.Instance}, ConverterParameter=500}" />
+
+                <!-- Slider-->
+                <Slider Grid.Column="1"
+                        Name="monthSlider"
+                        IsEnabled="True"
+                        Minimum="1"
+                        Maximum="12"
+                        Value="1"
+                        TickFrequency="1"
+                        IsSnapToTickEnabled="True"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch" />
+            </Grid>
+
+            <hmd:LabelContentControl Grid.Row="7"
+                                     Grid.Column="1"
+                                     LabelText="Intervall">
+            </hmd:LabelContentControl>
+            
+            <hmd:LabelContentControl Grid.Row="7"
+                                     Grid.Column="0"
+                                     LabelText="Tag des Monats">
+            </hmd:LabelContentControl>
+
+            <TextBox Grid.Row="8"
+                     x:Name="numberTextBoxIntervall"
+                     Grid.Column="1"
+                     PreviewTextInput="NumericTextBox_PreviewTextInput"  />
+            
+            <TextBox Grid.Row="8"
+                     x:Name="numberTextDayOfMonth"
+                     Grid.Column="0"
+                     PreviewTextInput="NumericTextBox_PreviewTextInput" />
+
+            <Button Grid.Row="9"
+                    Content="Berechnen"
+                    Click="ButtonClick"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource PrimaryButtonStyle}" 
+                    />
+
+        </Grid>
+        <DataGrid x:Name="DateGrid"
+                  Grid.Column="1"
+                  CanUserResizeColumns="True"
+                  SelectionMode="Extended">
+            <!--HeadersVisibility="Column"-->
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Nummer"
+                                    Binding="{Binding Number, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                    Width="25*"
+                                    HeaderStyle="{StaticResource DataGridColumnHeaderRightAlign}"
+                                    CellStyle="{StaticResource DataGridCellRightAlign}" />
+                <DataGridTextColumn Header="Datum"
+                                    Binding="{Binding Date, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat={}{0:dd.MM.yyyy}}"
+                                    Width="75*" />
+            </DataGrid.Columns>
+            <DataGrid.RowHeaderTemplate>
+                <DataTemplate>
+                    <TextBlock Width="20"
+                               Text="{Binding DataContext.Id, RelativeSource={RelativeSource AncestorType=DataGridRow}}"
+                               TextAlignment="Center" />
+                </DataTemplate>
+            </DataGrid.RowHeaderTemplate>
+        </DataGrid>
+        <!--<ItemsControl Grid.Column="1" Background="Gainsboro" />-->
+    </Grid>
+</hmd:HmdWindow>
