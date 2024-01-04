@@ -11,8 +11,10 @@
                mc:Ignorable="d"
                d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
                Title="Mein erstes Fenster"
-               Height="450"
+               Height="500"
                Width="800"
+               MinHeight="480"
+               MinWidth="750"
                ApplicationName="azubi">
     <!--<Window.Resources>
         <ResourceDictionary>
@@ -22,13 +24,11 @@
     </Window.Resources>-->
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="70*" />
-            <ColumnDefinition Width="30*" />
+            <ColumnDefinition Width="60*" />
+            <ColumnDefinition Width="40*" />
         </Grid.ColumnDefinitions>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -43,8 +43,6 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-
-
             <TextBlock Grid.Row="0"
                        Text="Betrachtungszeitraum"
                        Style="{StaticResource GroupTitleTextBlockStyle}"
@@ -53,14 +51,13 @@
             <hmd:LabelContentControl Grid.Row="1"
                                      LabelText="Start"
                                      IsRequired="True">
-                <DatePicker SelectedDate="{Binding RangeStart}"/>
+                <DatePicker SelectedDate="{Binding RangeStart}" />
             </hmd:LabelContentControl>
-
             <hmd:LabelContentControl Grid.Row="1"
                                      Grid.Column="1"
                                      LabelText="Ende"
                                      IsRequired="True">
-                <DatePicker SelectedDate="{Binding RangeEnd}"/>
+                <DatePicker SelectedDate="{Binding RangeEnd}" />
             </hmd:LabelContentControl>
 
             <TextBlock Grid.Row="2"
@@ -71,8 +68,9 @@
             <hmd:LabelContentControl Grid.Row="3"
                                      LabelText="Serientyp"
                                      IsRequired="True">
-                <ComboBox IsEditable="false" 
-                          SelectedValue="{Binding SelectedSerieType}" SelectedValuePath="Content">
+                <ComboBox IsEditable="false"
+                          SelectedValue="{Binding SelectedSerieType}"
+                          SelectedValuePath="Content">
                     <ComboBoxItem Content="Täglich" />
                     <ComboBoxItem Content="Wöchentlich" />
                     <ComboBoxItem Content="Monatlich" />
@@ -81,9 +79,19 @@
             </hmd:LabelContentControl>
             <hmd:LabelContentControl Grid.Row="3"
                                      Grid.Column="1"
+                                     LabelText="Limit">
+                <TextBox Grid.Column="1"
+                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                         Text="{Binding Limit}" />
+            </hmd:LabelContentControl>
+            
+            <hmd:LabelContentControl Grid.Row="4"
+                                     Grid.Column="1"
                                      LabelText="Wochentag"
                                      Visibility="{Binding IsWeekdayEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <ComboBox IsEditable="false"
+                          SelectedValue="{Binding WeekDay}"
+                          SelectedValuePath="Content"
                           IsEnabled="{Binding IsWeekdayEnabled}">
                     <ComboBoxItem Content="Montag" />
                     <ComboBoxItem Content="Dienstag" />
@@ -94,29 +102,35 @@
                     <ComboBoxItem Content="Sonntag" />
                 </ComboBox>
             </hmd:LabelContentControl>
-
-
+            <hmd:LabelContentControl Grid.Row="4"
+                                     Grid.Column="0"
+                                     LabelText="Intervall">
+                <TextBox PreviewTextInput="NumericTextBox_PreviewTextInput"
+                         Text="{Binding Intervall}" />
+            </hmd:LabelContentControl>
 
             <hmd:LabelContentControl Grid.Row="5"
-                                     LabelText="Monat">
+                                     LabelText="Monat"
+                                     Visibility="{Binding IsSliderEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
             </hmd:LabelContentControl>
             <hmd:LabelContentControl Grid.Row="5"
                                      Grid.Column="1"
-                                     LabelText="Limit">
-                <TextBox PreviewTextInput="NumericTextBox_PreviewTextInput" />
+                                     LabelText="Tag des Monats"
+                                     Visibility="{Binding IsDayOfMonthEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
+
             </hmd:LabelContentControl>
 
-
             <Grid Grid.Row="6"
-                  Grid.Column="0">
+                  Grid.Column="0"
+                  Visibility="{Binding IsSliderEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" MinWidth="70" />
+                    <ColumnDefinition Width="Auto"
+                                      MinWidth="70" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <!-- TextBlock für die Anzeige des ausgewählten Monats -->
 
-                <TextBlock 
-                           Grid.Column="0"
+                <TextBlock Grid.Column="0"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Left"
                            Margin="10,0,0,0"
@@ -129,26 +143,18 @@
                         IsEnabled="True"
                         Minimum="1"
                         Maximum="12"
-                        Value="1"
                         TickFrequency="1"
                         IsSnapToTickEnabled="True"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Stretch" />
+                        HorizontalAlignment="Stretch"
+                        Value="{Binding Month}"
+                        Visibility="{Binding IsSliderEnabled, Converter={StaticResource BooleanToVisibilityConverter}}" />
             </Grid>
-
-            <hmd:LabelContentControl Grid.Row="7"
-                                     Grid.Column="1"
-                                     LabelText="Intervall">
-                <TextBox PreviewTextInput="NumericTextBox_PreviewTextInput"  />
-            </hmd:LabelContentControl>
-
-            <hmd:LabelContentControl Grid.Row="7"
-                                     Grid.Column="0"
-                                     LabelText="Tag des Monats">
-            <TextBox PreviewTextInput="NumericTextBox_PreviewTextInput" />
-            </hmd:LabelContentControl>
-
-
+            <TextBox Grid.Row="6"
+                     Grid.Column="1"
+                     Visibility="{Binding IsDayOfMonthEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"
+                     PreviewTextInput="NumericTextBox_PreviewTextInput"
+                     Text="{Binding MonthDay}" />
 
             <Button Grid.Row="9"
                     Content="Berechnen"
@@ -159,15 +165,15 @@
         </Grid>
         <DataGrid Grid.Column="1"
                   ItemsSource="{Binding CalculatedDates}"
-                  CanUserResizeColumns="True" 
+                  CanUserResizeColumns="True"
                   AlternationCount="{ Binding CalculatedDates.Count}"
                   EnableRowVirtualization="False">
             <!--HeadersVisibility="Column"-->
             <DataGrid.Columns>
-                <DataGridTemplateColumn
-                    Header="Nr"
-                    HeaderStyle="{StaticResource DataGridColumnHeaderRightAlign}"
-                    CellStyle="{StaticResource DataGridCellRightAlign}">
+                <DataGridTemplateColumn Header="Nr"
+                                        Width="10*"
+                                        HeaderStyle="{StaticResource DataGridColumnHeaderRightAlign}"
+                                        CellStyle="{StaticResource DataGridCellRightAlign}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=(ItemsControl.AlternationIndex),
@@ -177,7 +183,17 @@
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Datum"
                                     Binding="{Binding Date, StringFormat=d}"
-                                    Width="80"
+                                    Width="30*"
+                                    HeaderStyle="{StaticResource DataGridColumnHeaderRightAlign}"
+                                    CellStyle="{StaticResource DataGridCellRightAlign}" />
+                <DataGridTextColumn Header="Wochentag"
+                                    Binding="{Binding Date, StringFormat=dddd}"
+                                    Width="30*"
+                                    HeaderStyle="{StaticResource DataGridColumnHeaderRightAlign}"
+                                    CellStyle="{StaticResource DataGridCellRightAlign}" />
+                <DataGridTextColumn Header="Monat"
+                                    Binding="{Binding Date, StringFormat=MMMM}"
+                                    Width="30*"
                                     HeaderStyle="{StaticResource DataGridColumnHeaderRightAlign}"
                                     CellStyle="{StaticResource DataGridCellRightAlign}" />
             </DataGrid.Columns>

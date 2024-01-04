@@ -122,32 +122,6 @@ namespace Serientermine
 
                 list.Add(serie);
 
-                //string day = child.GetValue<string>("Wochentage");
-                //string dayOfWeekIntervall = child.GetValue<string>("Wochentag-Intervall");
-                //string monthsString = child.GetValue<string>("Monat");
-                //List<int> months = new List<int>();
-                //List<string> dayList = new List<string>();
-                //List<int> weekdayList = new List<int>();
-                //if (months.Count != 0)
-                //{
-                //    string[] monthsArray = monthsString.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                //}
-                //if (day != null)
-                //{
-                //    string[] tageArray = day.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                //    dayList.AddRange(tageArray);
-                //}
-                //if (dayOfWeekIntervall != null)
-                //{
-                //    string[] weekdayIntervallArray = dayOfWeekIntervall.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                //    foreach (string weekday in weekdayIntervallArray)
-                //    {
-                //        weekdayList.Add(int.Parse(weekday));
-                //    }
-                //}
-                //Serientermine.Serie serie = new Serientermine.Serie(name, type, intervall, begin, end, dayList, weekdayList, months, limit);
-                //seriesList.Add(serie);
-
             }
 
             return list;

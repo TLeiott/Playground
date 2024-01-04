@@ -26,11 +26,6 @@ namespace Serientermine.Series
             if (DayList.Count > 1||DayList==null)
                 yield break;
 
-            //Zu hohe angaben bei Tag im Monat wenn kein Wochentag gegeben
-            if (DayList.Count != 0 && DayList != null && MonthDay > 5)
-            {
-                yield break;
-            }
 
             List<string> dayList = DayList;
 

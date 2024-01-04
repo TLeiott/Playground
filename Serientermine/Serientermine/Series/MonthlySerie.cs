@@ -34,7 +34,7 @@ namespace Serientermine.Series
             string targetDay = "";
             foreach (var day in dayList)
             {
-                targetDay = day;
+                targetDay = day.ToString();
             }
 
             if (DayList == null || DayList.Count == 0)//WOchentag nich angegeben
@@ -170,7 +170,7 @@ namespace Serientermine.Series
                     current = current.AddMonths(1);
                     current = new DateTime(current.Year, current.Month, 1);
                     current = current.AddDays(-1);
-                    while (current.DayOfWeek.ToString() != targetDay)
+                    while (current.DayOfWeek.ToString() != targetDay.ToString())
                     {
                         current = current.AddDays(-1);
                     }

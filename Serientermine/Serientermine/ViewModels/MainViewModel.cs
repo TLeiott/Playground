@@ -8,15 +8,24 @@ using System.Windows.Input;
 using Hmd.Core.UI.Dialogs;
 using Hmd.Core.UI.ViewModels;
 using Serientermine.Series;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace Serientermine.ViewModels
 {
     internal class MainViewModel : ViewModel
     {
         private string _selectedSerieType;
+        private int _inputDayOfMonth;
         private DateTime? _rangeStart;
         private DateTime? _rangeEnd;
         private List<DateTime> _calculatedDates;
+        private int _intervall;
+        private int _limit;
+        private int _month;
+        private int _monthDay;
+        private string _weekday;
+
 
         public MainViewModel() : base(null)
         {
@@ -26,7 +35,6 @@ namespace Serientermine.ViewModels
         }
 
         public ICommand CalcCommand { get; }
-
         public string SelectedSerieType
         {
             get => _selectedSerieType;
@@ -35,18 +43,104 @@ namespace Serientermine.ViewModels
                 if (!SetProperty(ref _selectedSerieType, value))
                     return;
 
-                IsWeekdayEnabled = value == "Monatlich";
+                if (value == "Monatlich" || value == "Jährlich" || value == "Wöchentlich")
+                {
+                    IsWeekdayEnabled = true;
+                }
+                else
+                {
+                    IsWeekdayEnabled = false;
+                }
+                if (value == "Täglich" || value == "Wöchentlich")
+                {
+                    IsDayOfMonthEnabled = false;
+                    IsSliderEnabled = false;
+                }
+                else
+                {
+                    IsDayOfMonthEnabled = true;
+                    IsSliderEnabled = true;
+                }
 
                 NotifyPropertyChanged(nameof(IsWeekdayEnabled));
+                NotifyPropertyChanged(nameof(IsDayOfMonthEnabled));
+                NotifyPropertyChanged(nameof(IsSliderEnabled));
+            }
+        }
+        public int InputDayOfMonth
+        {
+            get => _inputDayOfMonth;
+            set
+            {
+                if (!SetProperty(ref _inputDayOfMonth, value))
+                    return;
+                if (value > 5)
+                {
+                    IsWeekdayEnabled = true;
+                }
+                else
+                {
+                    IsWeekdayEnabled = false;
+                }
             }
         }
 
         public bool IsWeekdayEnabled { get; private set; }
 
+        public bool IsDayOfMonthEnabled { get; private set; }
+        public bool IsSliderEnabled { get; private set; }
+
         public DateTime? RangeStart
         {
             get => _rangeStart;
             set => SetProperty(ref _rangeStart, value);
+        }
+        public int Intervall
+        {
+            get => _intervall;
+            set => SetProperty(ref _intervall, value);
+        }
+        public int MonthDay
+        {
+            get => _monthDay;
+            set => SetProperty(ref _monthDay, value);
+        }
+        public int Month
+        {
+            get => _month;
+            set => SetProperty(ref _month, value);
+        }
+        public int Limit
+        {
+            get => _limit;
+            set => SetProperty(ref _limit, value);
+        }
+        public string WeekDay
+        {
+            get => _weekday;
+            set => SetProperty(ref _weekday, ConvertToEnglish(value));
+        }
+        private string ConvertToEnglish(string value)
+        {
+            string finalResult="";
+            switch (value)
+            {
+                case "Montag": finalResult = "Monday"; break;
+                case "Dienstag": finalResult = "Tuesday"; break;
+                case "Mittwoch": finalResult = "Wednesday"; break;
+                case "Donnerstag": finalResult = "Thursday"; break;
+                case "Freitag": finalResult = "Friday"; break;
+                case "Samstag": finalResult = "Saturday"; break;
+                case "Sonntag": finalResult = "Sunday"; break;
+            }
+            if (finalResult != "")
+            {
+                return finalResult;
+            }
+            else
+            {
+                return value;
+            }
         }
 
         public DateTime? RangeEnd
@@ -73,6 +167,12 @@ namespace Serientermine.ViewModels
             if (RangeStart > RangeEnd)
             {
                 DialogService.ShowDialogHmdMessageBox(this, "Startdatum muss vor Enddatum liegen.", "Fehler", HmdDialogIcon.Error);
+                return Task.CompletedTask;
+            }
+
+            if (Intervall < 1)
+            {
+                DialogService.ShowDialogHmdMessageBox(this, "Intervall muss >1 sein.", "Fehler", HmdDialogIcon.Error);
                 return Task.CompletedTask;
             }
 
@@ -122,8 +222,11 @@ namespace Serientermine.ViewModels
 
         private SerieBase GetSerie()
         {
-            return new FakeSerie();
-
+            List<string> weekDayList = new List<string>();
+            if (WeekDay != null && WeekDay != "")
+            {
+                weekDayList.Add(WeekDay);
+            }
             SerieBase serie;
             switch (SelectedSerieType)
             {
@@ -131,17 +234,33 @@ namespace Serientermine.ViewModels
                     serie = new DailySerie();
                     break;
                 case "Wöchentlich":
-                    serie = new WeeklySerie();
+                    serie = new WeeklySerie
+                    {
+                        DayList = weekDayList
+                    };
                     break;
                 case "Monatlich":
-                    serie = new MonthlySerie();
+                    serie = new MonthlySerie
+                    {
+                        DayList = weekDayList
+                    };
                     break;
                 case "Jährlich":
-                    serie = new YearlySerie();
+                    serie = new YearlySerie
+                    {
+                        DayList = weekDayList
+                    };
                     break;
                 default:
                     return null;
             }
+            serie.Begin = (DateTime)RangeStart;
+            serie.End = (DateTime)RangeEnd;
+            serie.Intervall = Intervall;
+            serie.Limit = Limit;
+            serie.Month = Month;
+            serie.MonthDay = MonthDay;
+
 
             return serie;
 
