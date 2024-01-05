@@ -51,13 +51,13 @@
             <hmd:LabelContentControl Grid.Row="1"
                                      LabelText="Start"
                                      IsRequired="True">
-                <DatePicker SelectedDate="{Binding RangeStart}" />
+                <DatePicker SelectedDate="{Binding SerieStart}" />
             </hmd:LabelContentControl>
             <hmd:LabelContentControl Grid.Row="1"
                                      Grid.Column="1"
                                      LabelText="Ende"
                                      IsRequired="True">
-                <DatePicker SelectedDate="{Binding RangeEnd}" />
+                <DatePicker SelectedDate="{Binding SerieEnd}" />
             </hmd:LabelContentControl>
 
             <TextBlock Grid.Row="2"
@@ -93,6 +93,7 @@
                           SelectedValue="{Binding WeekDay}"
                           SelectedValuePath="Content"
                           IsEnabled="{Binding IsWeekdayEnabled}">
+                    <ComboBoxItem Content="" />
                     <ComboBoxItem Content="Montag" />
                     <ComboBoxItem Content="Dienstag" />
                     <ComboBoxItem Content="Mittwoch" />

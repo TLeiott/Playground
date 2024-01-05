@@ -17,20 +17,22 @@ namespace Serientermine.ViewModels
     {
         private string _selectedSerieType;
         private int _inputDayOfMonth;
-        private DateTime? _rangeStart;
-        private DateTime? _rangeEnd;
+        private DateTime? _serieStart;
+        private DateTime? _serieEnd;
         private List<DateTime> _calculatedDates;
         private int _intervall;
         private int _limit;
         private int _month;
         private int _monthDay;
         private string _weekday;
+        public DateTime rangeStart = new DateTime(2024, 01, 01);
+        public DateTime rangeEnd = new DateTime(2100, 12, 31);
 
 
         public MainViewModel() : base(null)
         {
-            RangeStart = new DateTime(2021, 1, 1);
-            RangeEnd = new DateTime(2021, 1, 31);
+            SerieStart = new DateTime(2021, 1, 1);
+            SerieEnd = new DateTime(2021, 1, 31);
             CalcCommand = new DelegateCommandAsync(CalculateAsync);
         }
 
@@ -90,10 +92,10 @@ namespace Serientermine.ViewModels
         public bool IsDayOfMonthEnabled { get; private set; }
         public bool IsSliderEnabled { get; private set; }
 
-        public DateTime? RangeStart
+        public DateTime? SerieStart
         {
-            get => _rangeStart;
-            set => SetProperty(ref _rangeStart, value);
+            get => _serieStart;
+            set => SetProperty(ref _serieStart, value);
         }
         public int Intervall
         {
@@ -143,10 +145,10 @@ namespace Serientermine.ViewModels
             }
         }
 
-        public DateTime? RangeEnd
+        public DateTime? SerieEnd
         {
-            get => _rangeEnd;
-            set => SetProperty(ref _rangeEnd, value);
+            get => _serieEnd;
+            set => SetProperty(ref _serieEnd, value);
         }
 
         public List<DateTime> CalculatedDates
@@ -158,13 +160,13 @@ namespace Serientermine.ViewModels
         private Task CalculateAsync(CancellationToken token)
         {
             // Validierung
-            if (RangeStart == null || RangeEnd == null)
+            if (SerieStart == null || SerieEnd == null)
             {
                 DialogService.ShowDialogHmdMessageBox(this, "Bitte Start- und Enddatum angeben.", "Fehler", HmdDialogIcon.Error);
                 return Task.CompletedTask;
             }
 
-            if (RangeStart > RangeEnd)
+            if (SerieStart > SerieEnd)
             {
                 DialogService.ShowDialogHmdMessageBox(this, "Startdatum muss vor Enddatum liegen.", "Fehler", HmdDialogIcon.Error);
                 return Task.CompletedTask;
@@ -188,7 +190,7 @@ namespace Serientermine.ViewModels
                     return Task.CompletedTask;
                 }
 
-                CalculatedDates = serie.GetDatesInRange(RangeStart.Value, RangeEnd.Value).ToList();
+                CalculatedDates = serie.GetDatesInRange(rangeStart, rangeEnd).ToList();
                 //SerieBase serie;
                 //serie.Name = "";
                 //serie.Intervall = Int32.Parse(numberTextBoxIntervall.Text);
@@ -254,8 +256,8 @@ namespace Serientermine.ViewModels
                 default:
                     return null;
             }
-            serie.Begin = (DateTime)RangeStart;
-            serie.End = (DateTime)RangeEnd;
+            serie.Begin = (DateTime)SerieStart;
+            serie.End = (DateTime)SerieEnd;
             serie.Intervall = Intervall;
             serie.Limit = Limit;
             serie.Month = Month;
