@@ -206,7 +206,7 @@ namespace Serientermine.Series
         }
         private DateTime GetTargetDay(DateTime current)
         {
-            current = current = new DateTime(current.Year, Month, 1);
+            current = new DateTime(current.Year, Month, 1);
             if (DayList == null || DayList.Count == 0)//Wochentag nich angegeben
             {
                 if (MonthDay > 28)

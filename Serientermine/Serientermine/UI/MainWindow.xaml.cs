@@ -25,7 +25,6 @@ namespace Serientermine.UI
             InitializeComponent();
             termine.Add(new Termin { Number = 1, Date = DateTime.Now });
 
-            //DateGrid.ItemsSource = termine;
         }
         private void NumericTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
@@ -39,51 +38,6 @@ namespace Serientermine.UI
         private bool IsNumeric(string input)
         {
             return int.TryParse(input, out _);
-        }
-
-        private void NumberTextDayOfMonth_LostFocus(object sender, TextChangedEventArgs e)
-        {
-            //if (int.TryParse(numberTextDayOfMonth.Text, out int dayOfMonth))
-            //{
-            //    if (dayOfMonth > 5)
-            //    {
-            //        WeekDayComboBox.IsEnabled = false;
-            //    }
-            //    else
-            //    {
-            //        WeekDayComboBox.IsEnabled = true;
-            //    }
-            //}
-            //else
-            //{
-            //    WeekDayComboBox.IsEnabled = true;
-            //}
-        }
-        private void SerieTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            //if (SerieTypeComboBox.SelectedItem != null)
-            //{
-            //    string selectedValue = (SerieTypeComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
-
-            //    if (selectedValue == "Täglich" || selectedValue == "Wöchentlich")
-            //    {
-            //        monthSlider.IsEnabled = false;
-            //    }
-            //    else
-            //    {
-            //        monthSlider.IsEnabled = true;
-            //    }
-            //}
-            //else
-            //{
-            //    monthSlider.IsEnabled = false;
-            //}
-        }
-        private void ButtonClick(object sender, RoutedEventArgs e)
-        {
-            var rangeStart = new DateTime(2020, 1, 1);
-            var rangeEnd = new DateTime(2021, 1, 13);
-
         }
     }
 }

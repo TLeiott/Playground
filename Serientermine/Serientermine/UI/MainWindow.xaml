@@ -13,7 +13,7 @@
                Title="Mein erstes Fenster"
                Height="500"
                Width="800"
-               MinHeight="480"
+               MinHeight="575"
                MinWidth="750"
                ApplicationName="azubi">
     <!--<Window.Resources>
@@ -37,6 +37,8 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
@@ -51,21 +53,37 @@
             <hmd:LabelContentControl Grid.Row="1"
                                      LabelText="Start"
                                      IsRequired="True">
-                <DatePicker SelectedDate="{Binding SerieStart}" />
+                <DatePicker SelectedDate="{Binding RangeStart}" />
             </hmd:LabelContentControl>
             <hmd:LabelContentControl Grid.Row="1"
                                      Grid.Column="1"
                                      LabelText="Ende"
                                      IsRequired="True">
-                <DatePicker SelectedDate="{Binding SerieEnd}" />
+                <DatePicker SelectedDate="{Binding RangeEnd}" />
             </hmd:LabelContentControl>
-
+            
             <TextBlock Grid.Row="2"
-                       Text="Serieneigenschaften"
+                       Text="Serienzeitraum"
                        Style="{StaticResource GroupTitleTextBlockStyle}"
                        Grid.ColumnSpan="2" />
 
             <hmd:LabelContentControl Grid.Row="3"
+                                     LabelText="Start"
+                                     IsRequired="True">
+                <DatePicker SelectedDate="{Binding SerieStart}" />
+            </hmd:LabelContentControl>
+            <hmd:LabelContentControl Grid.Row="3"
+                                     Grid.Column="1"
+                                     LabelText="Ende">
+                <DatePicker SelectedDate="{Binding SerieEnd}" />
+            </hmd:LabelContentControl>
+
+            <TextBlock Grid.Row="4"
+                       Text="Serieneigenschaften"
+                       Style="{StaticResource GroupTitleTextBlockStyle}"
+                       Grid.ColumnSpan="2" />
+
+            <hmd:LabelContentControl Grid.Row="5"
                                      LabelText="Serientyp"
                                      IsRequired="True">
                 <ComboBox IsEditable="false"
@@ -77,7 +95,7 @@
                     <ComboBoxItem Content="Jährlich" />
                 </ComboBox>
             </hmd:LabelContentControl>
-            <hmd:LabelContentControl Grid.Row="3"
+            <hmd:LabelContentControl Grid.Row="5"
                                      Grid.Column="1"
                                      LabelText="Limit">
                 <TextBox Grid.Column="1"
@@ -85,7 +103,7 @@
                          Text="{Binding Limit}" />
             </hmd:LabelContentControl>
             
-            <hmd:LabelContentControl Grid.Row="4"
+            <hmd:LabelContentControl Grid.Row="6"
                                      Grid.Column="1"
                                      LabelText="Wochentag"
                                      Visibility="{Binding IsWeekdayEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -103,26 +121,27 @@
                     <ComboBoxItem Content="Sonntag" />
                 </ComboBox>
             </hmd:LabelContentControl>
-            <hmd:LabelContentControl Grid.Row="4"
+            <hmd:LabelContentControl Grid.Row="6"
                                      Grid.Column="0"
                                      LabelText="Intervall">
                 <TextBox PreviewTextInput="NumericTextBox_PreviewTextInput"
                          Text="{Binding Intervall}" />
             </hmd:LabelContentControl>
 
-            <hmd:LabelContentControl Grid.Row="5"
+            <hmd:LabelContentControl Grid.Row="7"
+                                     Grid.Column="1"
                                      LabelText="Monat"
                                      Visibility="{Binding IsSliderEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
             </hmd:LabelContentControl>
-            <hmd:LabelContentControl Grid.Row="5"
-                                     Grid.Column="1"
+            <hmd:LabelContentControl Grid.Row="7"
+                                     Grid.Column="0"
                                      LabelText="Tag des Monats"
                                      Visibility="{Binding IsDayOfMonthEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
 
             </hmd:LabelContentControl>
 
-            <Grid Grid.Row="6"
-                  Grid.Column="0"
+            <Grid Grid.Row="8"
+                  Grid.Column="1"
                   Visibility="{Binding IsSliderEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"
@@ -151,8 +170,8 @@
                         Value="{Binding Month}"
                         Visibility="{Binding IsSliderEnabled, Converter={StaticResource BooleanToVisibilityConverter}}" />
             </Grid>
-            <TextBox Grid.Row="6"
-                     Grid.Column="1"
+            <TextBox Grid.Row="8"
+                     Grid.Column="0"
                      Visibility="{Binding IsDayOfMonthEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"
                      PreviewTextInput="NumericTextBox_PreviewTextInput"
                      Text="{Binding MonthDay}" />

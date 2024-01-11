@@ -8,8 +8,6 @@ using System.Windows.Input;
 using Hmd.Core.UI.Dialogs;
 using Hmd.Core.UI.ViewModels;
 using Serientermine.Series;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
 
 namespace Serientermine.ViewModels
 {
@@ -17,7 +15,7 @@ namespace Serientermine.ViewModels
     {
         private string _selectedSerieType;
         private int _inputDayOfMonth;
-        private DateTime? _serieStart;
+        private DateTime _serieStart;
         private DateTime? _serieEnd;
         private List<DateTime> _calculatedDates;
         private int _intervall;
@@ -25,14 +23,17 @@ namespace Serientermine.ViewModels
         private int _month;
         private int _monthDay;
         private string _weekday;
-        public DateTime rangeStart = new DateTime(2024, 01, 01);
-        public DateTime rangeEnd = new DateTime(2100, 12, 31);
+        public DateTime _rangeStart;
+        public DateTime _rangeEnd;
 
 
         public MainViewModel() : base(null)
         {
-            SerieStart = new DateTime(2021, 1, 1);
-            SerieEnd = new DateTime(2021, 1, 31);
+            SerieStart = new DateTime(2024, 1, 1);
+            SerieEnd = new DateTime(2024, 12, 31);
+            RangeStart = new DateTime(2000, 1, 1);
+            RangeEnd = new DateTime(2030, 12, 31);
+            Month = 1;
             CalcCommand = new DelegateCommandAsync(CalculateAsync);
         }
 
@@ -61,7 +62,14 @@ namespace Serientermine.ViewModels
                 else
                 {
                     IsDayOfMonthEnabled = true;
+                }
+                if (value == "Jährlich")
+                {
                     IsSliderEnabled = true;
+                }
+                else
+                {
+                    IsSliderEnabled = false;
                 }
 
                 NotifyPropertyChanged(nameof(IsWeekdayEnabled));
@@ -86,16 +94,24 @@ namespace Serientermine.ViewModels
                 }
             }
         }
-
         public bool IsWeekdayEnabled { get; private set; }
-
         public bool IsDayOfMonthEnabled { get; private set; }
         public bool IsSliderEnabled { get; private set; }
 
-        public DateTime? SerieStart
+        public DateTime SerieStart
         {
             get => _serieStart;
             set => SetProperty(ref _serieStart, value);
+        }
+        public DateTime RangeStart
+        {
+            get => _rangeStart;
+            set => SetProperty(ref _rangeStart, value);
+        }
+        public DateTime RangeEnd
+        {
+            get => _rangeEnd;
+            set => SetProperty(ref _rangeEnd, value);
         }
         public int Intervall
         {
@@ -124,7 +140,7 @@ namespace Serientermine.ViewModels
         }
         private string ConvertToEnglish(string value)
         {
-            string finalResult="";
+            string finalResult = "";
             switch (value)
             {
                 case "Montag": finalResult = "Monday"; break;
@@ -160,21 +176,21 @@ namespace Serientermine.ViewModels
         private Task CalculateAsync(CancellationToken token)
         {
             // Validierung
-            if (SerieStart == null || SerieEnd == null)
+            if (SerieStart == null || SerieEnd == null || RangeStart == null || RangeEnd == null || SerieStart > SerieEnd)
             {
                 DialogService.ShowDialogHmdMessageBox(this, "Bitte Start- und Enddatum angeben.", "Fehler", HmdDialogIcon.Error);
                 return Task.CompletedTask;
             }
 
-            if (SerieStart > SerieEnd)
+            if (Intervall < 1 || Intervall.ToString() == "")
             {
-                DialogService.ShowDialogHmdMessageBox(this, "Startdatum muss vor Enddatum liegen.", "Fehler", HmdDialogIcon.Error);
+                DialogService.ShowDialogHmdMessageBox(this, "Intervall muss >0 sein.", "Fehler", HmdDialogIcon.Error);
                 return Task.CompletedTask;
             }
 
-            if (Intervall < 1)
+            if (MonthDay < 1 && (SelectedSerieType== "Monatlich"|| SelectedSerieType == "Jährlich"))
             {
-                DialogService.ShowDialogHmdMessageBox(this, "Intervall muss >1 sein.", "Fehler", HmdDialogIcon.Error);
+                DialogService.ShowDialogHmdMessageBox(this, "Tag des Monats muss >0 sein", "Fehler", HmdDialogIcon.Error);
                 return Task.CompletedTask;
             }
 
@@ -190,22 +206,7 @@ namespace Serientermine.ViewModels
                     return Task.CompletedTask;
                 }
 
-                CalculatedDates = serie.GetDatesInRange(rangeStart, rangeEnd).ToList();
-                //SerieBase serie;
-                //serie.Name = "";
-                //serie.Intervall = Int32.Parse(numberTextBoxIntervall.Text);
-                //serie.Limit = Int32.Parse(numberTextBoxLimit.Text);
-                //serie.Begin = MainViewModel.Start;
-                //serie.End = child.GetDateTime("end");
-                //serie.MonthDay = child.GetValue<int>("TagImMonat");
-                //serie.Month = child.GetValue<int>("MonatImJahr");
-                //var writer = new ConsoleWriter();   // Anhand von Parameter kann hier eine alternative Implementierung gewählt werden, z.B. FileWriter
-
-                //// Jetzt enthält seriesList Ihre Liste von Serie-Objekten
-                //foreach (var serie in series)
-                //{
-                //    writer.Write(serie, rangeStart, rangeEnd, rangeStart, rangeEnd);
-                //}
+                CalculatedDates = serie.GetDatesInRange(_rangeStart, _rangeEnd).ToList();
 
                 DialogService.ShowDialogHmdMessageBox(this, "Werte wurden berechnet.", "Berechnung",
                     HmdDialogIcon.Information);
@@ -228,6 +229,10 @@ namespace Serientermine.ViewModels
             if (WeekDay != null && WeekDay != "")
             {
                 weekDayList.Add(WeekDay);
+            }
+            else if (SelectedSerieType == "Wöchentlich")
+            {
+                weekDayList.Add(SerieStart.DayOfWeek.ToString());
             }
             SerieBase serie;
             switch (SelectedSerieType)
