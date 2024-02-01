@@ -8,8 +8,6 @@ namespace Serientermine.Series
     /// </summary>
     public sealed class YearlySerie : SerieBase
     {
-        public List<string> DayList { get; set; }
-
         public override SerieType Type => SerieType.Yearly;
 
         public override string IntervallDescription => $"Jede(n) {Intervall}. Monat";
@@ -17,33 +15,20 @@ namespace Serientermine.Series
         /// <inheritdoc cref="ISerie.GetDatesInRange(DateTime, DateTime)"/>
         public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end)
         {
-
             //leere angaben bei "TagImMonat" herausfiltern
             if (MonthDay == 0)
                 yield break;
 
-            //mehrere angaben bei "Wochentage" herausfiltern
-            if (DayList.Count > 1||DayList==null)
-                yield break;
-
-
-            List<string> dayList = DayList;
 
             //Startdatum definieren
             var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
             var current = Begin;
+            var weekDay = WeekDay;
             current = GetCorrectStartdate(Begin);
 
-
-            string targetDay = "";
-            foreach (var day in dayList)
+            if (weekDay == null || weekDay == "")//Wochentag nich angegeben
             {
-                targetDay = day;
-            }
-
-            if (DayList == null || DayList.Count == 0)//Wochentag nich angegeben
-            {
-                var result = CalculateDatesWithoutWeekday(checkedStart, checkedEnd, current, Limit, MonthDay, targetDay);
+                var result = CalculateDatesWithoutWeekday(checkedStart, checkedEnd, current, Limit, MonthDay, weekDay);
                 foreach (var item in result)
                     yield return item;
             }
@@ -51,13 +36,13 @@ namespace Serientermine.Series
             {
                 if (MonthDay < 5)
                 {
-                    var result = CalculateDatesWithWeekday(checkedStart, checkedEnd, current, Limit, MonthDay, targetDay);
+                    var result = CalculateDatesWithWeekday(checkedStart, checkedEnd, current, Limit, MonthDay, weekDay);
                     foreach (var item in result)
                         yield return item;
                 }
                 else
                 {
-                    var result = CalculateLastDatesWithWeekday(checkedStart, checkedEnd, current, Limit, MonthDay, targetDay);
+                    var result = CalculateLastDatesWithWeekday(checkedStart, checkedEnd, current, Limit, MonthDay, weekDay);
                     foreach (var item in result)
                         yield return item;
                 }
@@ -207,7 +192,7 @@ namespace Serientermine.Series
         private DateTime GetTargetDay(DateTime current)
         {
             current = new DateTime(current.Year, Month, 1);
-            if (DayList == null || DayList.Count == 0)//Wochentag nich angegeben
+            if (WeekDay == null || WeekDay == "")//Wochentag nich angegeben
             {
                 if (MonthDay > 28)
                 {

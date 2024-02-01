@@ -8,10 +8,13 @@ using System.Windows.Input;
 using Hmd.Core.UI.Dialogs;
 using Hmd.Core.UI.ViewModels;
 using Serientermine.Series;
+using Serientermine.Providers;
+using Serientermine.UI;
+using System.Collections.ObjectModel;
 
 namespace Serientermine.ViewModels
 {
-    internal class MainViewModel : ViewModel
+    internal sealed class MainViewModel : WindowViewModel, IReloadableViewModel
     {
         private string _selectedSerieType;
         private int _inputDayOfMonth;
@@ -26,6 +29,9 @@ namespace Serientermine.ViewModels
         public DateTime _rangeStart;
         public DateTime _rangeEnd;
 
+        private ObservableCollection<ISerie> _series;
+        private ISerie _selectedSerie;
+        private string _calculatedSerieName;
 
         public MainViewModel() : base(null)
         {
@@ -34,10 +40,67 @@ namespace Serientermine.ViewModels
             RangeStart = new DateTime(2000, 1, 1);
             RangeEnd = new DateTime(2030, 12, 31);
             Month = 1;
-            CalcCommand = new DelegateCommandAsync(CalculateAsync);
+
+            CreateCommand = new DelegateCommand(CreateSerie);
+            EditCommand = new DelegateCommand(EditSerie, () => SelectedSerie != null);
+            DeleteCommand = new DelegateCommand(DeleteSerie, () => SelectedSerie != null);
+            CalcCommand = new DelegateCommandAsync(CalculateAsync, () => SelectedSerie != null);
         }
 
-        public ICommand CalcCommand { get; }
+        public override Task InitializeAsync(CancellationToken token)
+            => ReloadAsync(token);
+
+        public async Task ReloadAsync(CancellationToken token)
+        {
+            try
+            {
+                IsBusy = true;
+
+                await Task.Delay(1000);
+
+                var selected = SelectedSerie;
+                var provider = new JsonSeriesProvider();
+                Series = new ObservableCollection<ISerie>(provider.GetSeries());
+                SelectedSerie = Series.FirstOrDefault(x => x.Name == selected?.Name);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        public override IEnumerable<IDelegateCommand> GetNotifyRequiredCommands()
+        {
+            yield return EditCommand;
+            yield return DeleteCommand;
+            yield return CalcCommand;
+        }
+
+        public ObservableCollection<ISerie> Series
+        {
+            get => _series;
+            set => SetProperty(ref _series, value);
+        }
+
+        public ISerie SelectedSerie
+        {
+            get => _selectedSerie;
+            set => SetProperty(ref _selectedSerie, value);
+        }
+
+        public string CalculatedSerieName
+        {
+            get => _calculatedSerieName;
+            set => SetProperty(ref _calculatedSerieName, value);
+        }
+
+        public ICommand CreateCommand { get; }
+
+        public IDelegateCommand EditCommand { get; }
+
+        public IDelegateCommand DeleteCommand { get; }
+
+        public IDelegateCommand CalcCommand { get; }
         public string SelectedSerieType
         {
             get => _selectedSerieType;
@@ -136,20 +199,20 @@ namespace Serientermine.ViewModels
         public string WeekDay
         {
             get => _weekday;
-            set => SetProperty(ref _weekday, ConvertToEnglish(value));
+            set => SetProperty(ref _weekday, value);
         }
         private string ConvertToEnglish(string value)
         {
             string finalResult = "";
             switch (value)
             {
-                case "Montag": finalResult = "Monday"; break;
-                case "Dienstag": finalResult = "Tuesday"; break;
-                case "Mittwoch": finalResult = "Wednesday"; break;
-                case "Donnerstag": finalResult = "Thursday"; break;
-                case "Freitag": finalResult = "Friday"; break;
-                case "Samstag": finalResult = "Saturday"; break;
-                case "Sonntag": finalResult = "Sunday"; break;
+                case "Montag"    : finalResult = "Monday"   ; break;
+                case "Dienstag"  : finalResult = "Tuesday"  ; break;
+                case "Mittwoch"  : finalResult = "Wednesday"; break;
+                case "Donnerstag": finalResult = "Thursday" ; break;
+                case "Freitag"   : finalResult = "Friday"   ; break;
+                case "Samstag"   : finalResult = "Saturday" ; break;
+                case "Sonntag"   : finalResult = "Sunday"   ; break;
             }
             if (finalResult != "")
             {
@@ -173,7 +236,70 @@ namespace Serientermine.ViewModels
             set => SetProperty(ref _calculatedDates, value);
         }
 
+        private void CreateSerie()
+        {
+            var serie = DialogService.ShowCreateSerieDialog(this);
+            if (serie == null)
+                return;
+
+            Series.Add(serie);
+            _ = ReloadAsync(CancellationToken.None);
+        }
+
+        private void EditSerie()
+        {
+            if (SelectedSerie == null)
+                return;
+
+            if (!DialogService.ShowEditSerieDialog(this, SelectedSerie))
+                return;
+
+            var series = Series;
+            Series = null;
+            Series = series;
+
+            // _ = ReloadAsync(CancellationToken.None);
+        }
+
+        private void DeleteSerie()
+        {
+            if (SelectedSerie == null)
+                return;
+
+            Series.Remove(SelectedSerie);
+            SelectedSerie = null;
+            CalculatedSerieName = null;
+            CalculatedDates = null;
+        }
+
         private Task CalculateAsync(CancellationToken token)
+        {
+            if (SelectedSerie == null)
+                return Task.CompletedTask;
+
+            try
+            {
+                IsBusy = true;
+
+                CalculatedSerieName = SelectedSerie.Name;
+                CalculatedDates = SelectedSerie.GetDatesInRange(_rangeStart, _rangeEnd).ToList();
+
+                DialogService.ShowDialogHmdMessageBox(this, "Werte wurden berechnet.", "Berechnung",
+                    HmdDialogIcon.Information);
+            }
+            catch (Exception e)
+            {
+                DialogService.ShowDialogHmdMessageBox(this, e.Message, "Fehler", HmdDialogIcon.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+
+            return Task.CompletedTask;
+        }
+
+        private Task ValidateAndCalculateAsync(CancellationToken token)
         {
             // Validierung
             if (SerieStart == null || SerieEnd == null || RangeStart == null || RangeEnd == null || SerieStart > SerieEnd)
@@ -188,7 +314,7 @@ namespace Serientermine.ViewModels
                 return Task.CompletedTask;
             }
 
-            if (MonthDay < 1 && (SelectedSerieType== "Monatlich"|| SelectedSerieType == "Jährlich"))
+            if (MonthDay < 1 && (SelectedSerieType == "Monatlich" || SelectedSerieType == "Jährlich"))
             {
                 DialogService.ShowDialogHmdMessageBox(this, "Tag des Monats muss >0 sein", "Fehler", HmdDialogIcon.Error);
                 return Task.CompletedTask;
@@ -224,7 +350,7 @@ namespace Serientermine.ViewModels
         }
 
         private SerieBase GetSerie()
-        {
+        {   
             List<string> weekDayList = new List<string>();
             if (WeekDay != null && WeekDay != "")
             {
@@ -247,16 +373,10 @@ namespace Serientermine.ViewModels
                     };
                     break;
                 case "Monatlich":
-                    serie = new MonthlySerie
-                    {
-                        DayList = weekDayList
-                    };
+                    serie = new MonthlySerie{};
                     break;
                 case "Jährlich":
-                    serie = new YearlySerie
-                    {
-                        DayList = weekDayList
-                    };
+                    serie = new YearlySerie{};
                     break;
                 default:
                     return null;

@@ -22,6 +22,7 @@ namespace Serientermine.Series
         /// "TagImMonat"=>Json
         /// </summary>
         public int MonthDay { get; set; }
+        public string WeekDay{ get; set; }
         /// <summary>
         /// "MonatImJahr"=>Json
         /// </summary>

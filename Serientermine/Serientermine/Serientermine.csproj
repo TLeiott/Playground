@@ -7,7 +7,7 @@
 		<Product>Serientermine</Product>
 		<Copyright>Copyright ©  2023</Copyright>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<LangVersion>9.0</LangVersion>
+		<LangVersion>10.0</LangVersion>
 		<UseWPF>true</UseWPF>
 	</PropertyGroup>
 	<ItemGroup>

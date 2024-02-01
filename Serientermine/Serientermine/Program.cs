@@ -30,7 +30,7 @@ namespace Serientermine
                     })
                     .RunWithCoreUi((environments, provider) =>
                     {
-                        return environments.RunAsWindow(() => new MainWindow { DataContext = new MainViewModel() });
+                        return environments.RunAsWindow(() => DialogStarter.GetMainWindow());
                     });
             }
             catch (Exception e)
@@ -97,16 +97,10 @@ namespace Serientermine
                         };
                         break;
                     case "Monthly":
-                        serie = new MonthlySerie
-                        {
-                            DayList = GetDayList(child.GetValue<string>("Wochentage"))
-                        };
+                        serie = new MonthlySerie{};
                         break;
                     case "Yearly":
-                        serie = new YearlySerie
-                        {
-                            DayList = GetDayList(child.GetValue<string>("Wochentage"))
-                        };
+                        serie = new YearlySerie{};
                         break;
                     default:                        
                         throw new NotSupportedException($"Der Serientyp '{type}' ist noch nicht implementiert.");

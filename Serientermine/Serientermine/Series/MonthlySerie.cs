@@ -8,8 +8,6 @@ namespace Serientermine.Series
     /// </summary>
     public sealed class MonthlySerie : SerieBase
     {
-        public List<string> DayList { get; set; } = new();
-
         public override SerieType Type => SerieType.Monthly;
 
         public override string IntervallDescription => $"Jede(n) {Intervall}. Monat";
@@ -21,25 +19,13 @@ namespace Serientermine.Series
             if (MonthDay == 0)
                 yield break;
 
-            //mehrere angaben bei "Wochentage" herausfiltern
-            if (DayList.Count > 1)
-                yield break;
-
-            List<string> dayList = DayList;
-
             //Startdatum definieren
             var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
             var current = Begin;
 
-            string targetDay = "";
-            foreach (var day in dayList)
+            if (WeekDay == null || WeekDay == "")//WOchentag nich angegeben
             {
-                targetDay = day.ToString();
-            }
-
-            if (DayList == null || DayList.Count == 0)//WOchentag nich angegeben
-            {
-                var result = CalculateDatesWithoutWeekday(checkedStart, checkedEnd, current, Limit, MonthDay, targetDay);
+                var result = CalculateDatesWithoutWeekday(checkedStart, checkedEnd, current, Limit, MonthDay, WeekDay);
                 foreach (var item in result)
                     yield return item;
             }
@@ -47,13 +33,13 @@ namespace Serientermine.Series
             {
                 if (MonthDay < 5)
                 {
-                    var result = CalculateDatesWithWeekday(checkedStart, checkedEnd, current, Limit, MonthDay, targetDay);
+                    var result = CalculateDatesWithWeekday(checkedStart, checkedEnd, current, Limit, MonthDay, WeekDay);
                     foreach (var item in result)
                         yield return item;
                 }
                 else
                 {
-                    var result = CalculateLastDatesWithWeekday(checkedStart, checkedEnd, current, Limit, MonthDay, targetDay);
+                    var result = CalculateLastDatesWithWeekday(checkedStart, checkedEnd, current, Limit, MonthDay, WeekDay);
                     foreach (var item in result)
                         yield return item;
                 }

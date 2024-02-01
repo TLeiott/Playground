@@ -41,6 +41,7 @@ namespace Serientermine.Series
         int Limit { get; }
 
         int MonthDay { get; }
+        string WeekDay { get; }
 
         int Month {  get; }
 
