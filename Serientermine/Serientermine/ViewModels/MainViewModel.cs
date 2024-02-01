@@ -314,7 +314,7 @@ namespace Serientermine.ViewModels
                 return Task.CompletedTask;
             }
 
-            if (MonthDay < 1 && (SelectedSerieType == "Monatlich" || SelectedSerieType == "Jährlich"))
+            if (MonthDay < 1 && (SelectedSerieType == "Monthly" || SelectedSerieType == "Yearly"))
             {
                 DialogService.ShowDialogHmdMessageBox(this, "Tag des Monats muss >0 sein", "Fehler", HmdDialogIcon.Error);
                 return Task.CompletedTask;
@@ -356,27 +356,24 @@ namespace Serientermine.ViewModels
             {
                 weekDayList.Add(WeekDay);
             }
-            else if (SelectedSerieType == "Wöchentlich")
+            else if (SelectedSerieType == "Weekly")
             {
                 weekDayList.Add(SerieStart.DayOfWeek.ToString());
             }
             SerieBase serie;
             switch (SelectedSerieType)
             {
-                case "Täglich":
+                case "Daily":
                     serie = new DailySerie();
                     break;
-                case "Wöchentlich":
-                    serie = new WeeklySerie
-                    {
-                        DayList = weekDayList
-                    };
+                case "Weekly":
+                    serie = new WeeklySerie();
                     break;
-                case "Monatlich":
-                    serie = new MonthlySerie{};
+                case "Monthly":
+                    serie = new MonthlySerie();
                     break;
-                case "Jährlich":
-                    serie = new YearlySerie{};
+                case "Yearly":
+                    serie = new YearlySerie();
                     break;
                 default:
                     return null;
@@ -387,6 +384,7 @@ namespace Serientermine.ViewModels
             serie.Limit = Limit;
             serie.Month = Month;
             serie.MonthDay = MonthDay;
+            serie.WeekDay = WeekDay;
 
 
             return serie;

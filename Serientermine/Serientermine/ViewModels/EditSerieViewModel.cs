@@ -26,7 +26,7 @@ namespace Serientermine.ViewModels
         public EditSerieViewModel(IViewModel parent) : base(parent, true)
         {
             Title = "Serie erstellen";
-            //SaveBehaviour = EditSaveBehaviour.ShowMessageOnSuccess;
+            SaveBehaviour = EditSaveBehaviour.ShowMessageOnSuccess;
         }
 
         public EditSerieViewModel(IViewModel parent, ISerie serie) : base(parent, false)
@@ -40,15 +40,16 @@ namespace Serientermine.ViewModels
             Limit = _serie.Limit;
             Month = _serie.Month;
             MonthDay = _serie.MonthDay;
-            SerieStart = _serie.Begin;
+            SerieStart = _serie.Begin;  
             SerieEnd = _serie.End;
+            WeekDay= _serie.WeekDay;
             //if(_serie=DailySerie)
             //WeekDay = DayOfWeek.Sunday.ToGermanText();
 
             //WeekDay= ConvertFromEnglish(_serie.DayList[0]);
             IsDirty = false;
 
-            //SaveBehaviour = EditSaveBehaviour.ShowMessageOnSuccess;
+            SaveBehaviour = EditSaveBehaviour.ShowMessageOnSuccess;
         }
 
         public bool IsWeekdayEnabled { get; private set; }
@@ -161,22 +162,13 @@ namespace Serientermine.ViewModels
                         serie = new DailySerie();
                         break;
                     case "Weekly":
-                        serie = new WeeklySerie
-                        {
-                            //DayList = GetDayList(child.GetValue<string>("Wochentage"))
-                        };
+                        serie = new WeeklySerie();
                         break;
                     case "Monthly":
-                        serie = new MonthlySerie
-                        {
-                            //DayList = GetDayList(child.GetValue<string>("Wochentage"))
-                        };
+                        serie = new MonthlySerie();
                         break;
                     case "Yearly":
-                        serie = new YearlySerie
-                        {
-                            //DayList = GetDayList(child.GetValue<string>("Wochentage"))
-                        };
+                        serie = new YearlySerie();
                         break;
                     default:
                         throw new NotSupportedException($"Der Serientyp '{_serie.Type}' ist noch nicht implementiert.");
