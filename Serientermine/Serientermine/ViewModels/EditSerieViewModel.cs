@@ -31,7 +31,7 @@ namespace Serientermine.ViewModels
 
         public EditSerieViewModel(IViewModel parent, ISerie serie) : base(parent, false)
         {
-            _serie = serie;
+            _serie = serie ?? throw new ArgumentNullException(nameof(serie));
 
             Title = "Serie bearbeiten";
             Subtitle = _serie.Name;
@@ -150,7 +150,7 @@ namespace Serientermine.ViewModels
             if (string.IsNullOrWhiteSpace(WeekDay) && SelectedSerieType == "Weekly")
                 yield return "Es muss ein Wochentag ausgewählt werden.";
         }
-
+        
         protected override Task<(bool, string)> SavingAsync(CancellationToken token)
         {
             if (IsCreateMode)
@@ -174,9 +174,21 @@ namespace Serientermine.ViewModels
                         throw new NotSupportedException($"Der Serientyp '{_serie.Type}' ist noch nicht implementiert.");
                 }
             }
-            else if (_serie is SerieBase value && !value.Name.Contains(".Saved"))
+
+            var serieBase = _serie as SerieBase;
+            //serieBase.Name = Name
+            serieBase.Begin = SerieStart;
+            serieBase.End = SerieEnd;
+            serieBase.Intervall = Intervall;
+            serieBase.Limit = Limit;
+            serieBase.Month = Month;
+            serieBase.MonthDay = MonthDay;
+            serieBase.WeekDay = WeekDay;
+
+            switch (_serie)
             {
-                value.Name += ".Saved";
+                case DailySerie daily:
+                    break;
             }
 
             return Task.FromResult((true, "Das Speichern war erfolgreich."));
