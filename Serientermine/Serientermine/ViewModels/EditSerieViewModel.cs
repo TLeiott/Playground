@@ -1,4 +1,5 @@
-﻿using Hmd.Core.UI.Validations.Entities;
+﻿using Hmd.Core.UI.Dialogs;
+using Hmd.Core.UI.Validations.Entities;
 using Hmd.Core.UI.ViewModels;
 using Serientermine.Serientermine;
 using Serientermine.Series;
@@ -19,6 +20,7 @@ namespace Serientermine.ViewModels
         private int _month;
         private int _monthDay;
         private string _weekday = string.Empty;
+        private string _name = string.Empty;
         private ISerie _serie;
         private DateTime _serieStart = DateTime.Today;
         private DateTime? _serieEnd;
@@ -35,25 +37,31 @@ namespace Serientermine.ViewModels
 
             Title = "Serie bearbeiten";
             Subtitle = _serie.Name;
+            Name = _serie.Name;
             SelectedSerieType = _serie.Type.ToString();
             Intervall = _serie.Intervall;
             Limit = _serie.Limit;
             Month = _serie.Month;
             MonthDay = _serie.MonthDay;
-            SerieStart = _serie.Begin;  
+            SerieStart = _serie.Begin;
             SerieEnd = _serie.End;
-            WeekDay= _serie.WeekDay;
+            WeekDay = _serie.WeekDay;
             //if(_serie=DailySerie)
             //WeekDay = DayOfWeek.Sunday.ToGermanText();
 
             //WeekDay= ConvertFromEnglish(_serie.DayList[0]);
             IsDirty = false;
-
+            if (IsCreateMode)
+            {
+                IsTypeEnabled = false;
+                NotifyPropertyChanged(nameof(IsTypeEnabled));
+            }
             SaveBehaviour = EditSaveBehaviour.ShowMessageOnSuccess;
         }
 
         public bool IsWeekdayEnabled { get; private set; }
         public bool IsDayOfMonthEnabled { get; private set; }
+        public bool IsTypeEnabled { get; private set; }
         public bool IsSliderEnabled { get; private set; }
         public int Intervall
         {
@@ -75,6 +83,12 @@ namespace Serientermine.ViewModels
             get => _limit;
             set => SetProperty(ref _limit, value);
         }
+        public string Name
+        {
+            get => _name;
+            set => SetProperty(ref _name, value);
+        }
+
         public string WeekDay
         {
             get => _weekday;
@@ -150,32 +164,45 @@ namespace Serientermine.ViewModels
             if (string.IsNullOrWhiteSpace(WeekDay) && SelectedSerieType == "Weekly")
                 yield return "Es muss ein Wochentag ausgewählt werden.";
         }
-        
+
         protected override Task<(bool, string)> SavingAsync(CancellationToken token)
         {
+            SerieBase serieBase = _serie as SerieBase;
             if (IsCreateMode)
             {
-                ISerie serie;
-                switch (_serie.Type.ToString())
+                switch (_selectedSerieType.ToString())
                 {
                     case "Daily":
-                        serie = new DailySerie();
+                        serieBase = new DailySerie();
                         break;
                     case "Weekly":
-                        serie = new WeeklySerie();
+                        serieBase = new WeeklySerie();
                         break;
                     case "Monthly":
-                        serie = new MonthlySerie();
+                        serieBase = new MonthlySerie();
                         break;
                     case "Yearly":
-                        serie = new YearlySerie();
+                        serieBase = new YearlySerie();
                         break;
                     default:
                         throw new NotSupportedException($"Der Serientyp '{_serie.Type}' ist noch nicht implementiert.");
                 }
             }
 
-            var serieBase = _serie as SerieBase;
+            if (Intervall < 1 || Intervall.ToString() == "")
+            {
+                return Task.FromResult((false, "Intervall muss >0 sein."));
+            }
+            if (Name.Length < 1 || Name == "")
+            {
+                return Task.FromResult((false, "Ein Name muss angegeben sein."));
+            }
+            if (MonthDay < 1 && (SelectedSerieType == "Monthly" || SelectedSerieType == "Yearly"))
+            {
+                return Task.FromResult((false, "Tag des Monats muss >0 sein"));
+            }
+
+
             //serieBase.Name = Name
             serieBase.Begin = SerieStart;
             serieBase.End = SerieEnd;
@@ -184,6 +211,7 @@ namespace Serientermine.ViewModels
             serieBase.Month = Month;
             serieBase.MonthDay = MonthDay;
             serieBase.WeekDay = WeekDay;
+            serieBase.Name = Name;
 
             switch (_serie)
             {
@@ -192,6 +220,31 @@ namespace Serientermine.ViewModels
             }
 
             return Task.FromResult((true, "Das Speichern war erfolgreich."));
+        }
+        /// <summary>
+        /// Checkt ob mit diesen werten gespeichert werden kann.
+        /// </summary>
+        private bool CheckLegitimacy()
+        {
+            if (Intervall < 1 || Intervall.ToString() == "")
+            {
+                DialogService.ShowDialogHmdMessageBox(this, "Intervall muss >0 sein.", "Fehler", HmdDialogIcon.Error);
+                return false;
+            }
+            else if (Name.Length < 1 || Name == "")
+            {
+                DialogService.ShowDialogHmdMessageBox(this, "Ein Name muss angegeben sein.", "Fehler", HmdDialogIcon.Error);
+                return false;
+            }
+            else if (MonthDay < 1 && (SelectedSerieType == "Monthly" || SelectedSerieType == "Yearly"))
+            {
+                DialogService.ShowDialogHmdMessageBox(this, "Tag des Monats muss >0 sein", "Fehler", HmdDialogIcon.Error);
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }

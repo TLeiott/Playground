@@ -42,6 +42,8 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
@@ -71,8 +73,15 @@
                            Grid.ColumnSpan="2" />
 
                 <hmd:LabelContentControl Grid.Row="5"
-                                         LabelText="Serientyp"
+                                         LabelText="Serienname"
                                          IsRequired="True">
+                    <TextBox Text="{Binding Name}"/>
+                </hmd:LabelContentControl>
+
+                <hmd:LabelContentControl Grid.Row="6"
+                                         LabelText="Serientyp"
+                                         IsRequired="True"
+                                         IsEnabled="{Binding IsTypeEnabled}">
                     <ComboBox IsEditable="false"
                               SelectedValuePath="Tag"
                               SelectedValue="{Binding SelectedSerieType}">
@@ -82,7 +91,7 @@
                         <ComboBoxItem Tag="Yearly" Content="Jährlich" />
                     </ComboBox>
                 </hmd:LabelContentControl>
-                <hmd:LabelContentControl Grid.Row="5"
+                <hmd:LabelContentControl Grid.Row="6"
                                          Grid.Column="1"
                                          LabelText="Limit">
                     <TextBox Grid.Column="1"
@@ -90,7 +99,7 @@
                              Text="{Binding Limit}" />
                 </hmd:LabelContentControl>
 
-                <hmd:LabelContentControl Grid.Row="6"
+                <hmd:LabelContentControl Grid.Row="7"
                                          Grid.Column="1"
                                          LabelText="Wochentag"
                                          Visibility="{Binding IsWeekdayEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -117,26 +126,26 @@
                                       Content="Sonntag" />
                     </ComboBox>
                 </hmd:LabelContentControl>
-                <hmd:LabelContentControl Grid.Row="6"
+                <hmd:LabelContentControl Grid.Row="7"
                                          Grid.Column="0"
                                          LabelText="Intervall">
                     <TextBox PreviewTextInput="NumericTextBox_PreviewTextInput"
                              Text="{Binding Intervall}" />
                 </hmd:LabelContentControl>
 
-                <hmd:LabelContentControl Grid.Row="7"
+                <hmd:LabelContentControl Grid.Row="8"
                                          Grid.Column="1"
                                          LabelText="Monat"
                                          Visibility="{Binding IsSliderEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
                 </hmd:LabelContentControl>
-                <hmd:LabelContentControl Grid.Row="7"
+                <hmd:LabelContentControl Grid.Row="8"
                                          Grid.Column="0"
                                          LabelText="Tag des Monats"
                                          Visibility="{Binding IsDayOfMonthEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
 
                 </hmd:LabelContentControl>
 
-                <Grid Grid.Row="8"
+                <Grid Grid.Row="9"
                       Grid.Column="1"
                       Visibility="{Binding IsSliderEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Grid.ColumnDefinitions>
@@ -166,7 +175,7 @@
                             Value="{Binding Month}"
                             Visibility="{Binding IsSliderEnabled, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </Grid>
-                <TextBox Grid.Row="8"
+                <TextBox Grid.Row="9"
                          Grid.Column="0"
                          Visibility="{Binding IsDayOfMonthEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"
                          PreviewTextInput="NumericTextBox_PreviewTextInput"

@@ -201,28 +201,6 @@ namespace Serientermine.ViewModels
             get => _weekday;
             set => SetProperty(ref _weekday, value);
         }
-        private string ConvertToEnglish(string value)
-        {
-            string finalResult = "";
-            switch (value)
-            {
-                case "Montag"    : finalResult = "Monday"   ; break;
-                case "Dienstag"  : finalResult = "Tuesday"  ; break;
-                case "Mittwoch"  : finalResult = "Wednesday"; break;
-                case "Donnerstag": finalResult = "Thursday" ; break;
-                case "Freitag"   : finalResult = "Friday"   ; break;
-                case "Samstag"   : finalResult = "Saturday" ; break;
-                case "Sonntag"   : finalResult = "Sunday"   ; break;
-            }
-            if (finalResult != "")
-            {
-                return finalResult;
-            }
-            else
-            {
-                return value;
-            }
-        }
 
         public DateTime? SerieEnd
         {

@@ -5,7 +5,7 @@ namespace Serientermine.Series
 {
     public abstract class SerieBase : ISerie
     {
-        public abstract SerieType Type { get; set; }
+        public abstract SerieType Type { get; }
 
         public string Name { get; set; }
 
