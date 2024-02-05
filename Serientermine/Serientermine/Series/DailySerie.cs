@@ -15,15 +15,11 @@ namespace Serientermine.Series
         /// <inheritdoc />
         public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end)
         {
-            //DEBUGING
-            DateTime debug_startTime = DateTime.Now;
-
             var intervall = Intervall;
 
             // Startdatum festlegen
             var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
-            var current = checkedStart;
-            current = Begin;
+            var current = Begin;
             var count = 0;
 
             TimeSpan difference = checkedStart - Begin;
@@ -31,12 +27,9 @@ namespace Serientermine.Series
             current=current.AddDays(gap*Intervall);
             count = gap;
 
-            //DEBUGING
-            DateTime debug_stepTime = DateTime.Now;
-
             while (current <= checkedEnd && (count < Limit || Limit == 0)) //wenn im zeitraum
             {
-               if (IsInRange(checkedStart, checkedEnd, current))
+               if (current >= checkedStart)
                 {
                     yield return current;
                 }
@@ -45,7 +38,5 @@ namespace Serientermine.Series
                 current = current.AddDays(intervall);// Tag
             }
         }
-        private static bool IsInRange(DateTime checkedStart, DateTime checkedEnd, DateTime current) 
-            => current >= checkedStart && current <= checkedEnd;
     }
 }

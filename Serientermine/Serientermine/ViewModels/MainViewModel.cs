@@ -201,13 +201,11 @@ namespace Serientermine.ViewModels
             get => _weekday;
             set => SetProperty(ref _weekday, value);
         }
-
         public DateTime? SerieEnd
         {
             get => _serieEnd;
             set => SetProperty(ref _serieEnd, value);
         }
-
         public List<DateTime> CalculatedDates
         {
             get => _calculatedDates;

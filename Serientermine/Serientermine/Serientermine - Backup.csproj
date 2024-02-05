@@ -26,4 +26,7 @@
 	    <SubType>Designer</SubType>
 	  </Page>
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="NewFolder\" />
+	</ItemGroup>
 </Project>

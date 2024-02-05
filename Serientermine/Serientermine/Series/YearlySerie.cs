@@ -74,7 +74,7 @@ namespace Serientermine.Series
                     {
                         if (monthDay > 28)
                         {
-                            if (IsInRange(checkedStart, checkedEnd, current))
+                            if (current >= checkedStart)
                             {
                                 yield return current;
                             }
@@ -83,7 +83,7 @@ namespace Serientermine.Series
                     }
                     else if (current.Day == monthDay)
                     {
-                        if (IsInRange(checkedStart, checkedEnd, current))
+                        if (current >= checkedStart)
                         {
                             yield return current;
                         }
@@ -128,7 +128,7 @@ namespace Serientermine.Series
                         weekDayCount++;
                         if (weekDayCount == MonthDay)
                         {
-                            if (IsInRange(checkedStart, checkedEnd, current))
+                            if (current >= checkedStart)
                             {
                                 yield return current;
                             }
@@ -164,7 +164,7 @@ namespace Serientermine.Series
                 {
                     current = current.AddDays(-1);
                 }
-                if (IsInRange(checkedStart, checkedEnd, current))
+                if (current >= checkedStart)
                 {
                     yield return current;
                 }
