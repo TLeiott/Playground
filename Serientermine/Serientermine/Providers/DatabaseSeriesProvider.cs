@@ -4,14 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Primitives;
+using Serientermine.CalculateDates;
 using Serientermine.Serientermine;
 using Serientermine.Series;
 
-namespace SerientermineErmitteln.Data.Database
+namespace Serientermine.Providers
 {
-    public class DatabaseProvider
+    internal class DatabaseSeriesProvider : ISeriesProvider
     {
         private const string CreateTableSql = @"
             CREATE TABLE IF NOT EXISTS Series (
@@ -40,10 +42,7 @@ namespace SerientermineErmitteln.Data.Database
             return connection;
         }
 
-
-
-
-        public async Task<List<ISerie>> GetSeries(CancellationToken token)
+        public async Task<List<ISerie>> GetSeriesAsync(CancellationToken token)
         {
             using var connection = await GetConnectionAndCheckDbStructureAsync(token);
             using var command = connection.CreateCommand();
@@ -74,6 +73,14 @@ namespace SerientermineErmitteln.Data.Database
                     default:
                         throw new NotSupportedException($"Der Serientyp '{seriesType}' ist noch nicht implementiert.");
                 }
+                //serie.Begin = SerieStart;
+                //serie.End = SerieEnd;
+                //serie.Intervall = Intervall;
+                //serie.Limit = Limit;
+                //serie.Month = Month;
+                //serie.MonthDay = MonthDay;
+                //serie.WeekDay = WeekDay;
+                //serie.Name = Name;
 
                 series.Add(serie);
             }

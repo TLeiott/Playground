@@ -11,6 +11,7 @@ using Serientermine.Series;
 using Serientermine.Providers;
 using Serientermine.UI;
 using System.Collections.ObjectModel;
+using Hmd.Environments;
 
 namespace Serientermine.ViewModels
 {
@@ -59,9 +60,13 @@ namespace Serientermine.ViewModels
                 await Task.Delay(1000);
 
                 var selected = SelectedSerie;
-                var provider = new JsonSeriesProvider();
-                Series = new ObservableCollection<ISerie>(provider.GetSeries());
+                var provider = HmdEnvironment.GetRequiredService<ISeriesProvider>();
+                Series = new ObservableCollection<ISerie>(await provider.GetSeriesAsync(token));
                 SelectedSerie = Series.FirstOrDefault(x => x.Name == selected?.Name);
+            }
+            catch (Exception e)
+            {
+                DialogService.ShowDialogHmdException(this, e);
             }
             finally
             {

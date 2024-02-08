@@ -19,7 +19,7 @@ namespace Serientermine.Test
                 Begin = new DateTime(2021, 1, 1),
                 End = new DateTime(2021, 7, 30),
                 Intervall = 3,
-                DayList = new List<string> { "Wednesday" },
+                //DayList = new List<string> { "Wednesday" },
                 MonthDay = 3
             };
         }

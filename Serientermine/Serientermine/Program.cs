@@ -28,6 +28,15 @@ namespace Serientermine
                     {
                         
                     })
+                    .ConfigureServices((_, collection) =>
+                    {                        
+                        collection.AddSingleton<ISeriesProvider>(_ =>
+                        {
+                            return HmdEnvironment.GetConfigValue<bool>("Hmd:UseDatabase")
+                                                        ? new DatabaseSeriesProvider()
+                                                        : new JsonSeriesProvider();
+                        });
+                    })
                     .RunWithCoreUi((environments, provider) =>
                     {
                         return environments.RunAsWindow(() => DialogStarter.GetMainWindow());
@@ -138,6 +147,29 @@ namespace Serientermine
                 case "Sunday": output = 0; break;
             }
             return output;
+        }
+
+        // Klasse die höchstens einmal während der Lebenszeit einer Anwendung existieren kann
+        public class Singleton
+        {
+            private Singleton(int parameter1) 
+            {
+                Parameter1 = parameter1;
+            }
+
+            public int Parameter1 { get;  }
+
+            public static Singleton Instance { get; private set; }
+
+            public static Singleton CreateInstance(int parameter1)
+            {
+                if (Instance != null)
+                    throw new InvalidOperationException("Die Instanz wurde bereits erzeugt.");
+
+                Instance = new Singleton(parameter1);
+
+                return Instance;
+            }
         }
     }
 }

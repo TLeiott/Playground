@@ -14,7 +14,7 @@ namespace Serientermine.Test
                 Begin = new DateTime(2023, 1, 1),
                 End = new DateTime(2023, 4, 30),
                 Intervall = 2,
-                DayList = new List<string> { "Monday" },
+                //DayList = new List<string> { "Monday" },
                 MonthDay = 5
             };
         }

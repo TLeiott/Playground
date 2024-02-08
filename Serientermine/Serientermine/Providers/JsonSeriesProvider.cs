@@ -4,12 +4,14 @@ using Serientermine.Series;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Serientermine.Providers
 {
     internal class JsonSeriesProvider : ISeriesProvider
     {
-        public List<ISerie> GetSeries()
+        public Task<List<ISerie>> GetSeriesAsync(CancellationToken token)
         {
             var list = new List<ISerie>();
 
@@ -53,8 +55,8 @@ namespace Serientermine.Providers
                 list.Add(serie);
 
             }
-
-            return list;
+            
+            return Task.FromResult(list);
 
             static List<string> GetDayList(string weekdays)
                 => (weekdays ?? string.Empty).Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
