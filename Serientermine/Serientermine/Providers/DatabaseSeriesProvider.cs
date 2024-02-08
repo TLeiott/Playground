@@ -23,7 +23,7 @@ namespace Serientermine.Providers
                 Begin TEXT NOT NULL,
                 End TEXT,
                 Intervall INTEGER NOT NULL,
-                Limit INTEGER,
+                RepeatLimit INTEGER,
                 WeekDay TEXT,
                 MonthDay INTEGER,
                 Month INTEGER

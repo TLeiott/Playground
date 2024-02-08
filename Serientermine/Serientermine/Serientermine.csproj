@@ -17,16 +17,11 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\Serientermine.Data\Serientermine.Data.csproj" />
+	</ItemGroup>
+	<ItemGroup>
 		<None Update="appsettings.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-	</ItemGroup>
-	<ItemGroup>
-	  <Page Update="UI\MainWindow.xaml">
-	    <SubType>Designer</SubType>
-	  </Page>
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Database\" />
 	</ItemGroup>
 </Project>
