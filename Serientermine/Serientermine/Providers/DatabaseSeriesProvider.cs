@@ -53,21 +53,21 @@ namespace Serientermine.Providers
 
             while (await reader.ReadAsync(token))
             {
-                var seriesType = await reader.GetFieldValueAsync<string>(1, token);
+                var seriesType = (SerieType)await reader.GetFieldValueAsync<int>(1, token);
                 SerieBase serie;
 
                 switch (seriesType)
                 {
-                    case "Daily":
+                    case SerieType.Daily:
                         serie = new DailySerie();
                         break;
-                    case "Weekly":
+                    case SerieType.Weekly:
                         serie = new WeeklySerie();
                         break;
-                    case "Monthly":
+                    case SerieType.Monthly:
                         serie = new MonthlySerie();
                         break;
-                    case "Yearly":
+                    case SerieType.Yearly:
                         serie = new YearlySerie();
                         break;
                     default:

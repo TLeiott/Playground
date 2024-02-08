@@ -27,15 +27,29 @@ namespace Serientermine.Series
             current=current.AddDays(gap*Intervall);
             count = gap;
 
-            while (current <= checkedEnd && (count < Limit || Limit == 0)) //wenn im zeitraum
+            if (Limit == 0)
             {
-               if (current >= checkedStart)
+                while (current <= checkedEnd) //wenn im zeitraum
                 {
-                    yield return current;
+                    if (current >= checkedStart)
+                    {
+                        yield return current;
+                    }
+                    current = current.AddDays(intervall);// Tag
                 }
-                
-                count++;
-                current = current.AddDays(intervall);// Tag
+            }
+            else
+            {
+                while (current <= checkedEnd && (count < Limit)) //wenn im zeitraum
+                {
+                    if (current >= checkedStart)
+                    {
+                        yield return current;
+                    }
+
+                    count++;
+                    current = current.AddDays(intervall);// Tag
+                }
             }
         }
     }
