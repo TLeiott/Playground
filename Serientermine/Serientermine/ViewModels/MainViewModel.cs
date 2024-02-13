@@ -44,7 +44,7 @@ namespace Serientermine.ViewModels
 
             CreateCommand = new DelegateCommand(CreateSerie);
             EditCommand = new DelegateCommand(EditSerie, () => SelectedSerie != null);
-            DeleteCommand = new DelegateCommand(DeleteSerie, () => SelectedSerie != null);
+            DeleteCommand = new DelegateCommand(DeleteSerieAsync, () => SelectedSerie != null);
             CalcCommand = new DelegateCommandAsync(CalculateAsync, () => SelectedSerie != null);
         }
 
@@ -224,7 +224,7 @@ namespace Serientermine.ViewModels
                 return;
 
             Series.Add(serie);
-            _ = ReloadAsync(CancellationToken.None);
+            ReloadAsync(CancellationToken.None);
         }
 
         private void EditSerie()
@@ -232,29 +232,25 @@ namespace Serientermine.ViewModels
             if (SelectedSerie == null)
                 return;
 
-            if (!DialogService.ShowEditSerieDialog(this, SelectedSerie))
-                return;
-
-            var series = Series;
-            Series = null;
-            Series = series;
+            DialogService.ShowEditSerieDialog(this, SelectedSerie);
+            //tabaseSeriesProvider.DeleteSeriesAsync(SelectedSerie.Id);
+            ReloadAsync(CancellationToken.None);
 
             // _ = ReloadAsync(CancellationToken.None);
         }
 
-        private void DeleteSerie()
+        private async void DeleteSerieAsync()
         {
             if (SelectedSerie == null)
                 return;
-
-            Series.Remove(SelectedSerie);
-            SelectedSerie = null;
-            CalculatedSerieName = null;
-            CalculatedDates = null;
+            await DatabaseSeriesProvider.DeleteSeriesAsync(SelectedSerie.Id);
+            ReloadAsync(CancellationToken.None);
+            //WEITER: Hier ist das Problem, bessergasgt warscheinlich der ansatz zur lösung. Das Löschen funktioniert noch nicht. und wenn man eine Serie bearbeitet, dann wird die neue Version zwar gespeichert, aber das alte nicht gelösch oder überschrieben. 
         }
 
         private Task CalculateAsync(CancellationToken token)
         {
+
             if (SelectedSerie == null)
                 return Task.CompletedTask;
 

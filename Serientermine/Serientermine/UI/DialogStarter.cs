@@ -3,10 +3,6 @@ using Hmd.Core.UI.ViewModels;
 using Serientermine.Series;
 using Serientermine.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Serientermine.UI

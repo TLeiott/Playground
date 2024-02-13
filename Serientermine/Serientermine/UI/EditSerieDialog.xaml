@@ -12,7 +12,7 @@
                 d:DataContext="{d:DesignInstance viewmodels:EditSerieViewModel}"
                 Title="{Binding Title}"
                 Height="450"
-                Width="800"
+                Width="900"
                 Padding="0"
                 TitlebarVisibility="Collapsed"
                 WindowStartupLocation="CenterOwner">

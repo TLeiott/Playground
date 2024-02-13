@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Serientermine.Series
 {
@@ -19,64 +18,45 @@ namespace Serientermine.Series
         /// <inheritdoc />
         public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end)
         {
-            //leere angaben bei "Wochentage" herausfiltern
-            if (DayList == null || DayList.Count == 0)
+            // Vorabprüfung auf leere Eingabe
+            if (string.IsNullOrEmpty(WeekDay))
                 yield break;
 
-            var dayList = DayList
-                .Select(x => Enum.TryParse<DayOfWeek>(x, out var y) ? (DayOfWeek?)y : null)
-                .Where(x => x != null)
-                .Select(x => x.Value)
-                .Distinct()
-                .ToList();
-            var intervall = Intervall;
+            // Prüfen des Wochentags mit vorab festgelegtem Wochentag
+            DayOfWeek desiredDay;
+            if (!Enum.TryParse(WeekDay, out desiredDay))
+                yield break;
 
-
-
-            //Startdatum definieren
             var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
             var current = Begin;
 
-
-            //auf den Letzten Montag zurückgehen um eine verschobene Wochenberechnung zu verhindern
+            // Auf den letzten Montag zurückgehen, um eine verschobene Wochenberechnung zu verhindern
             var daysUntilLastMonday = ((int)current.DayOfWeek - (int)DayOfWeek.Monday + 7) % 7;
             current = current.AddDays(-daysUntilLastMonday);
 
-            var count = 0;//Counter für das Terminlimit
+            // Berechne die Anzahl der Tage zwischen den gewünschten Terminen
+            var daysBetweenDesiredDays = (int)desiredDay - (int)current.DayOfWeek;
+            if (daysBetweenDesiredDays < 0)
+                daysBetweenDesiredDays += 7;
 
-            while (current <= checkedEnd && (count < Limit || Limit == 0))//wenn im zeitraum
+            // Schleife durch die Termine
+            var count = 0;
+            while (current <= checkedEnd && (count < Limit || Limit == 0))
             {
-                for (var i = 0; i < 7; i++)
+                if (current >= checkedStart && IsInRange(checkedStart, checkedEnd, current))
                 {
-                    foreach (var weekday in dayList) //für jeden Tag in der Liste
-                    {
-                        if (count >= Limit && Limit != 0)
-                            yield break;
-
-                        if (weekday == current.DayOfWeek)
-                        {
-                            if (current >= checkedStart && IsInRange(checkedStart, checkedEnd, current))
-                                yield return current;
-
-                            if (current >= Begin)
-                                count++;
-
-                            break;
-                        }
-                    }
-
-                    current = current.AddDays(1);//+1 Tag
+                    yield return current;
+                    count++;
                 }
 
-                current = current
-                    .AddDays(-7)
-                    .AddDays(7 * intervall);
+                // Fortsetzen zu nächsten Wochentag
+                current = current.AddDays(daysBetweenDesiredDays);
 
-                // Alternative:
-                //if (intervall > 1) 
-                //    current = current.AddDays(7 * (intervall - 1));
+                // Schleife um Intervall anpassen
+                current = current.AddDays(7 * Intervall);
             }
         }
+
 
         private static bool IsInRange(DateTime checkedStart, DateTime checkedEnd, DateTime current)
             => current >= checkedStart && current <= checkedEnd;

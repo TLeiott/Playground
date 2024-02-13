@@ -87,39 +87,16 @@
                     Style="{StaticResource PrimaryButtonStyle}" />
             <Label Grid.Row="4" Content="{Binding CalculatedSerieName}" />
             <DataGrid Grid.Row="5"
-                        Grid.ColumnSpan="2"
-                        ItemsSource="{Binding CalculatedDates}"
-                        CanUserResizeColumns="True"
-                        AlternationCount="{ Binding CalculatedDates.Count}"
-                        EnableRowVirtualization="False">
-                <!--HeadersVisibility="Column"-->
+                      Grid.ColumnSpan="2"
+                      ItemsSource="{Binding CalculatedDates}"
+                      CanUserResizeColumns="True">
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="Nr"
-                                            Width="10*"
-                                            HeaderStyle="{StaticResource DataGridColumnHeaderRightAlign}"
-                                            CellStyle="{StaticResource DataGridCellRightAlign}">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Path=(ItemsControl.AlternationIndex),
-                RelativeSource={RelativeSource AncestorType=DataGridRow}}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Datum"
-                                        Binding="{Binding Date, StringFormat=d}"
-                                        Width="30*"
-                                        HeaderStyle="{StaticResource DataGridColumnHeaderRightAlign}"
-                                        CellStyle="{StaticResource DataGridCellRightAlign}" />
+                                        Binding="{Binding Date, StringFormat=d}" />
                     <DataGridTextColumn Header="Wochentag"
-                                        Binding="{Binding Date, StringFormat=dddd}"
-                                        Width="30*"
-                                        HeaderStyle="{StaticResource DataGridColumnHeaderRightAlign}"
-                                        CellStyle="{StaticResource DataGridCellRightAlign}" />
+                                        Binding="{Binding Date, StringFormat=dddd}" />
                     <DataGridTextColumn Header="Monat"
-                                        Binding="{Binding Date, StringFormat=MMMM}"
-                                        Width="30*"
-                                        HeaderStyle="{StaticResource DataGridColumnHeaderRightAlign}"
-                                        CellStyle="{StaticResource DataGridCellRightAlign}" />
+                                        Binding="{Binding Date, StringFormat=MMMM}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

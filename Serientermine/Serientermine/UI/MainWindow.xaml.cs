@@ -1,7 +1,4 @@
 ﻿using Hmd.Core.UI.Controls.CustomControls;
-using System.Collections.Generic;
-using System;
-using System.Windows.Input;
 
 namespace Serientermine.UI
 {

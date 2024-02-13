@@ -10,6 +10,8 @@ namespace Serientermine.Series
         /// </summary>
         SerieType Type { get; }
 
+        int Id { get; }
+
         /// <summary>
         /// Name der Serie
         /// </summary>

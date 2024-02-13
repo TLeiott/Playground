@@ -1,12 +1,11 @@
-﻿using Hmd.Core.UI.Dialogs;
-using Hmd.Core.UI.Validations.Entities;
+﻿using Hmd.Core.UI.Commands;
+using Hmd.Core.UI.Dialogs;
 using Hmd.Core.UI.ViewModels;
-using Serientermine.Serientermine;
+using Hmd.Environments;
+using Serientermine.Providers;
 using Serientermine.Series;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,6 +28,9 @@ namespace Serientermine.ViewModels
         {
             Title = "Serie erstellen";
             SaveBehaviour = EditSaveBehaviour.ShowMessageOnSuccess;
+            IsTypeEnabled = true;
+            SaveCommand = new DelegateCommandAsync(SaveAsync);
+            NotifyPropertyChanged(nameof(IsTypeEnabled));
         }
 
         public EditSerieViewModel(IViewModel parent, ISerie serie) : base(parent, false)
@@ -51,12 +53,8 @@ namespace Serientermine.ViewModels
 
             //WeekDay= ConvertFromEnglish(_serie.DayList[0]);
             IsDirty = false;
-            if (IsCreateMode)
-            {
-                IsTypeEnabled = false;
-                NotifyPropertyChanged(nameof(IsTypeEnabled));
-            }
-            SaveBehaviour = EditSaveBehaviour.ShowMessageOnSuccess;
+            IsTypeEnabled = false;
+            NotifyPropertyChanged(nameof(IsTypeEnabled));
         }
 
         public bool IsWeekdayEnabled { get; private set; }
@@ -218,6 +216,16 @@ namespace Serientermine.ViewModels
                 case DailySerie daily:
                     break;
             }
+            var provider = HmdEnvironment.GetRequiredService<ISeriesProvider>();
+            if(IsCreateMode)
+            {
+                provider.CreateAsync(serieBase, token);
+            }
+            else
+            {
+                provider.UpdateAsync(serieBase, token);
+            }
+            InitializeAsync(token);
 
             return Task.FromResult((true, "Das Speichern war erfolgreich."));
         }

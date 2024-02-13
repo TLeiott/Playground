@@ -11,5 +11,8 @@ namespace Serientermine.Providers
     internal interface ISeriesProvider
     {
         Task<List<ISerie>> GetSeriesAsync(CancellationToken token);
+
+        Task CreateAsync(ISerie serie, CancellationToken token);
+        Task UpdateAsync(ISerie serie, CancellationToken token);
     }
 }

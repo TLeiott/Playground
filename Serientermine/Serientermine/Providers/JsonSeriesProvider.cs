@@ -11,6 +11,11 @@ namespace Serientermine.Providers
 {
     internal class JsonSeriesProvider : ISeriesProvider
     {
+        public Task CreateAsync(ISerie serie, CancellationToken token)
+            => Task.CompletedTask;
+        public Task UpdateAsync(ISerie serie, CancellationToken token)
+            => Task.CompletedTask;
+
         public Task<List<ISerie>> GetSeriesAsync(CancellationToken token)
         {
             var list = new List<ISerie>();

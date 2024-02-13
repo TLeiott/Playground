@@ -7,7 +7,6 @@ using Microsoft.Extensions.Hosting;
 using Serientermine.Providers;
 using Serientermine.Series;
 using Serientermine.UI;
-using Serientermine.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
