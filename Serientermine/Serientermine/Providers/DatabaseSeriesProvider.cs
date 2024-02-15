@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Primitives;
-using Serientermine.CalculateDates;
-using Serientermine.Serientermine;
 using Serientermine.Series;
 
 namespace Serientermine.Providers
@@ -34,8 +28,8 @@ namespace Serientermine.Providers
             var connectionString = "Data Source=serientermine.db";
             var connection = new SqliteConnection(connectionString);
             await connection.OpenAsync(token);
-            if (!_hasCheckDbStructure) 
-            { 
+            if (!_hasCheckDbStructure)
+            {
                 using var command = connection.CreateCommand();
                 command.CommandText = CreateTableSql;
                 await command.ExecuteNonQueryAsync(token);

@@ -22,21 +22,11 @@ namespace Serientermine.Series
             int gap = (int)Math.Floor((checkedStart - Begin).Days / (double)intervall);
             current = current.AddDays(gap * intervall);
             // Generieren der Daten im Bereich
-
-
-            ///////////////////////////////////////////////////////
-            var stopwatch = new System.Diagnostics.Stopwatch();
-            stopwatch.Start();
-
             while (current <= checkedEnd && (Limit == 0 || current <= checkedStart.AddDays(Limit * intervall)))
             {
                 yield return current;
                 current = current.AddDays(intervall);
             }
-
-            stopwatch.Stop();
-            var runtimeInMs = stopwatch.ElapsedMilliseconds;
-            ////////////////////////////////////////////////////
         }
 
     }

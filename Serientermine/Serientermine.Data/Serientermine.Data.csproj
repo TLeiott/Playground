@@ -6,11 +6,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.1" />
+	  <Compile Remove="Providers\**" />
+	  <EmbeddedResource Remove="Providers\**" />
+	  <None Remove="Providers\**" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Providers\" />
+	  <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.1" />
 	</ItemGroup>
 
 </Project>

@@ -48,8 +48,8 @@ namespace Serientermine.ViewModels
             CalcCommand = new DelegateCommandAsync(CalculateAsync, () => SelectedSerie != null);
         }
 
-        public override Task InitializeAsync(CancellationToken token)
-            => ReloadAsync(token);
+        //public override Task InitializeAsync(CancellationToken token)
+        //    => ReloadAsync(token);
 
         public async Task ReloadAsync(CancellationToken token)
         {
@@ -143,23 +143,6 @@ namespace Serientermine.ViewModels
                 NotifyPropertyChanged(nameof(IsWeekdayEnabled));
                 NotifyPropertyChanged(nameof(IsDayOfMonthEnabled));
                 NotifyPropertyChanged(nameof(IsSliderEnabled));
-            }
-        }
-        public int InputDayOfMonth
-        {
-            get => _inputDayOfMonth;
-            set
-            {
-                if (!SetProperty(ref _inputDayOfMonth, value))
-                    return;
-                if (value > 5)
-                {
-                    IsWeekdayEnabled = true;
-                }
-                else
-                {
-                    IsWeekdayEnabled = false;
-                }
             }
         }
         public bool IsWeekdayEnabled { get; private set; }
@@ -274,98 +257,6 @@ namespace Serientermine.ViewModels
             }
 
             return Task.CompletedTask;
-        }
-
-        private Task ValidateAndCalculateAsync(CancellationToken token)
-        {
-            // Validierung
-            if (SerieStart == null || SerieEnd == null || RangeStart == null || RangeEnd == null || SerieStart > SerieEnd)
-            {
-                DialogService.ShowDialogHmdMessageBox(this, "Bitte Start- und Enddatum angeben.", "Fehler", HmdDialogIcon.Error);
-                return Task.CompletedTask;
-            }
-
-            if (Intervall < 1 || Intervall.ToString() == "")
-            {
-                DialogService.ShowDialogHmdMessageBox(this, "Intervall muss >0 sein.", "Fehler", HmdDialogIcon.Error);
-                return Task.CompletedTask;
-            }
-
-            if (MonthDay < 1 && (SelectedSerieType == "Monthly" || SelectedSerieType == "Yearly"))
-            {
-                DialogService.ShowDialogHmdMessageBox(this, "Tag des Monats muss >0 sein", "Fehler", HmdDialogIcon.Error);
-                return Task.CompletedTask;
-            }
-
-            try
-            {
-                IsBusy = true;
-
-                var serie = GetSerie();
-
-                if (serie == null)
-                {
-                    DialogService.ShowDialogHmdMessageBox(this, "Bitte Serientyp auswählen.", "Fehler", HmdDialogIcon.Error);
-                    return Task.CompletedTask;
-                }
-
-                CalculatedDates = serie.GetDatesInRange(_rangeStart, _rangeEnd).ToList();
-
-                DialogService.ShowDialogHmdMessageBox(this, "Werte wurden berechnet.", "Berechnung",
-                    HmdDialogIcon.Information);
-            }
-            catch (Exception e)
-            {
-                DialogService.ShowDialogHmdMessageBox(this, e.Message, "Fehler", HmdDialogIcon.Error);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-
-            return Task.CompletedTask;
-        }
-
-        private SerieBase GetSerie()
-        {   
-            List<string> weekDayList = new List<string>();
-            if (WeekDay != null && WeekDay != "")
-            {
-                weekDayList.Add(WeekDay);
-            }
-            else if (SelectedSerieType == "Weekly")
-            {
-                weekDayList.Add(SerieStart.DayOfWeek.ToString());
-            }
-            SerieBase serie;
-            switch (SelectedSerieType)
-            {
-                case "Daily":
-                    serie = new DailySerie();
-                    break;
-                case "Weekly":
-                    serie = new WeeklySerie();
-                    break;
-                case "Monthly":
-                    serie = new MonthlySerie();
-                    break;
-                case "Yearly":
-                    serie = new YearlySerie();
-                    break;
-                default:
-                    return null;
-            }
-            serie.Begin = (DateTime)SerieStart;
-            serie.End = (DateTime)SerieEnd;
-            serie.Intervall = Intervall;
-            serie.Limit = Limit;
-            serie.Month = Month;
-            serie.MonthDay = MonthDay;
-            serie.WeekDay = WeekDay;
-
-
-            return serie;
-
         }
     }
 }
