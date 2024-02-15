@@ -41,7 +41,7 @@ namespace Serientermine.Series
 
             // Schleife durch die Termine
             var count = 0;
-            while (current <= checkedEnd && (count < Limit || Limit == 0))
+            while (current <= checkedEnd && (Limit == 0 || current <= Begin.AddDays(Limit * Intervall * 7).AddDays(-7)))
             {
                 if (current >= checkedStart && IsInRange(checkedStart, checkedEnd, current))
                 {

@@ -33,13 +33,14 @@ namespace Serientermine.ViewModels
         private ObservableCollection<ISerie> _series;
         private ISerie _selectedSerie;
         private string _calculatedSerieName;
+        private int _calculatedSerieCount;
 
         public MainViewModel() : base(null)
         {
             SerieStart = new DateTime(2024, 1, 1);
             SerieEnd = new DateTime(2024, 12, 31);
-            RangeStart = new DateTime(2000, 1, 1);
-            RangeEnd = new DateTime(2030, 12, 31);
+            RangeStart = new DateTime(0001, 1, 1);
+            RangeEnd = new DateTime(9998, 12, 31);
             Month = 1;
 
             CreateCommand = new DelegateCommand(CreateSerie);
@@ -97,6 +98,12 @@ namespace Serientermine.ViewModels
         {
             get => _calculatedSerieName;
             set => SetProperty(ref _calculatedSerieName, value);
+        }
+
+        public int CalculatedSerieCount
+        {
+            get => _calculatedSerieCount;
+            set => SetProperty(ref _calculatedSerieCount, value);
         }
 
         public ICommand CreateCommand { get; }
@@ -242,6 +249,7 @@ namespace Serientermine.ViewModels
                 IsBusy = true;
 
                 CalculatedSerieName = SelectedSerie.Name;
+                CalculatedSerieCount = SelectedSerie.GetDatesInRange(_rangeStart, _rangeEnd).Count();
                 CalculatedDates = SelectedSerie.GetDatesInRange(_rangeStart, _rangeEnd).ToList();
 
                 DialogService.ShowDialogHmdMessageBox(this, "Werte wurden berechnet.", "Berechnung",

@@ -85,7 +85,13 @@
                     Command="{Binding CalcCommand}"
                     HorizontalAlignment="Left"
                     Style="{StaticResource PrimaryButtonStyle}" />
-            <Label Grid.Row="4" Content="{Binding CalculatedSerieName}" />
+            <Label Grid.Row="4"
+                   Content="{Binding CalculatedSerieName}" />
+            <Label Grid.Row="4"
+                   Grid.Column="1"
+                   HorizontalAlignment="Right"
+                   Margin="0,12,10,0"
+                   Content="{Binding CalculatedSerieCount}" />
             <DataGrid Grid.Row="5"
                       Grid.ColumnSpan="2"
                       ItemsSource="{Binding CalculatedDates}"

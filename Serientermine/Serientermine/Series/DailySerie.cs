@@ -13,19 +13,18 @@ namespace Serientermine.Series
         /// <inheritdoc />
         public override IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end)
         {
-
-            var intervall = Intervall;
             // Startdatum festlegen
             var (checkedStart, checkedEnd) = GetDatesForOutput(start, end);
             var current = Begin;
             // Berechnen des Abstands zwischen checkedStart und Begin
-            int gap = (int)Math.Floor((checkedStart - Begin).Days / (double)intervall);
-            current = current.AddDays(gap * intervall);
+            int gap = (int)Math.Floor((checkedStart - Begin).Days / (double)Intervall);
+            current = current.AddDays(gap * Intervall);
             // Generieren der Daten im Bereich
-            while (current <= checkedEnd && (Limit == 0 || current <= checkedStart.AddDays(Limit * intervall)))
+
+            while (current <= checkedEnd && (Limit == 0 || current <= Begin.AddDays(Limit * Intervall).AddDays(-1)))
             {
                 yield return current;
-                current = current.AddDays(intervall);
+                current = current.AddDays(Intervall);
             }
         }
 
