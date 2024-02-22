@@ -40,7 +40,7 @@ namespace Serientermine.ViewModels
             Title = "Serie bearbeiten";
             Subtitle = _serie.Name;
             Name = _serie.Name;
-            SelectedSerieType = _serie.Type.ToString();
+            SelectedSerieType = _serie.Type1.ToString();
             Intervall = _serie.Intervall;
             Limit = _serie.Limit;
             Month = _serie.Month;
@@ -183,7 +183,7 @@ namespace Serientermine.ViewModels
                         serieBase = new YearlySerie();
                         break;
                     default:
-                        throw new NotSupportedException($"Der Serientyp '{_serie.Type}' ist noch nicht implementiert.");
+                        throw new NotSupportedException($"Der Serientyp '{_serie.Type1}' ist noch nicht implementiert.");
                 }
             }
 

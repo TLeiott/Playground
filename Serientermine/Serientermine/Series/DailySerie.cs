@@ -7,7 +7,7 @@ namespace Serientermine.Series
     public sealed class DailySerie : SerieBase
     {
         /// <inheritdoc />
-        public override SerieType Type => SerieType.Daily;
+        public override SerieType Type1 => SerieType.Daily;
         /// <inheritdoc />
         public override string IntervallDescription => $"Jede(n) {Intervall}. Tag";
         /// <inheritdoc />

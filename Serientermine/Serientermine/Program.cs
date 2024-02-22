@@ -7,11 +7,13 @@ using Microsoft.Extensions.Hosting;
 using Serientermine.Providers;
 using Serientermine.Series;
 using Serientermine.UI;
+using SerientermineErmitteln.Data.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using ConsoleWriter = Serientermine.Providers.ConsoleWriter;
+using Microsoft.EntityFrameworkCore;
 
 namespace Serientermine
 {
@@ -25,21 +27,34 @@ namespace Serientermine
                 return HmdApplication
                     .InitializeApplication(args, new HmdApplicationConfiguration()
                     {
-                        
+
                     })
-                    .ConfigureServices((_, collection) =>
-                    {                        
-                        collection.AddSingleton<ISeriesProvider>(_ =>
-                        {
-                            return HmdEnvironment.GetConfigValue<bool>("Hmd:UseDatabase")
-                                                        ? new DatabaseSeriesProvider()
-                                                        : new JsonSeriesProvider();
-                        });
-                    })
-                    .RunWithCoreUi((environments, provider) =>
+                    //.ConfigureServices((_, collection) =>
+                    //{
+                    //    collection.AddSingleton<ISeriesProvider>(_ =>
+                    //    {
+                    //        return HmdEnvironment.GetConfigValue<bool>("Hmd:UseDatabase")
+                    //                                    ? new DatabaseSeriesProvider()
+                    //                                    : new JsonSeriesProvider();
+                    //    });
+                    //})
+                    .ConfigureServices((_, services) =>
                     {
-                        return environments.RunAsWindow(() => DialogStarter.GetMainWindow());
-                    });
+                        services.AddDbContext<TerminDbContext>(options =>
+                            options.UseSqlite("Data Source=serientermine.db"), ServiceLifetime.Transient, ServiceLifetime.Transient);
+                        services.AddSingleton<ISeriesProvider, DatabaseSeriesProvider>();
+                    })
+                    //.RunWithCoreUi((environments, provider) =>
+                    //{
+                    //    return environments.RunAsWindow(() => DialogStarter.GetMainWindow());
+                    //});
+                     .RunWithCoreUi((environment, provider) =>
+                     {
+                         var dbProvider = provider.GetRequiredService<ISeriesProvider>();
+                         dbProvider.CheckDbStructureAsync(default).Wait();
+
+                         return environment.RunAsWindow(DialogStarter.GetMainWindow);
+                     });
             }
             catch (Exception e)
             {
@@ -99,18 +114,15 @@ namespace Serientermine
                         serie = new DailySerie();
                         break;
                     case "Weekly":
-                        serie = new WeeklySerie
-                        {
-                            DayList = GetDayList(child.GetValue<string>("Wochentage"))
-                        };
+                        serie = new WeeklySerie();
                         break;
                     case "Monthly":
-                        serie = new MonthlySerie{};
+                        serie = new MonthlySerie();
                         break;
                     case "Yearly":
-                        serie = new YearlySerie{};
+                        serie = new YearlySerie();
                         break;
-                    default:                        
+                    default:
                         throw new NotSupportedException($"Der Serientyp '{type}' ist noch nicht implementiert.");
                 }
 
@@ -132,31 +144,16 @@ namespace Serientermine
                 => (weekdays ?? string.Empty).Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
         }
-        static int WeekdayToInt(string input)
-        {
-            int output = 0;
-            switch (input)
-            {
-                case "Monday": output = 1; break;
-                case "Tuesday": output = 2; break;
-                case "Wednesday": output = 3; break;
-                case "Thursday": output = 4; break;
-                case "Friday": output = 5; break;
-                case "Saturday": output = 6; break;
-                case "Sunday": output = 0; break;
-            }
-            return output;
-        }
 
         // Klasse die höchstens einmal während der Lebenszeit einer Anwendung existieren kann
         public class Singleton
         {
-            private Singleton(int parameter1) 
+            private Singleton(int parameter1)
             {
                 Parameter1 = parameter1;
             }
 
-            public int Parameter1 { get;  }
+            public int Parameter1 { get; }
 
             public static Singleton Instance { get; private set; }
 

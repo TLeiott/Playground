@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net472</TargetFramework>
+		<TargetFramework>net8.0-windows</TargetFramework>
 		<AssemblyTitle>Serientermine</AssemblyTitle>
 		<Product>Serientermine</Product>
 		<Copyright>Copyright ©  2023</Copyright>
@@ -11,9 +11,11 @@
 		<UseWPF>true</UseWPF>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Hmd.Core.UI" Version="2.5.102.676" />
+		<PackageReference Include="Hmd.Core.UI" Version="2.5.104.257" />
 		<PackageReference Include="Hmd.Environments.Builders" Version="3.0.101.842" />
-		<PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
 	</ItemGroup>
 	<ItemGroup>

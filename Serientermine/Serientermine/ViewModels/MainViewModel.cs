@@ -12,6 +12,8 @@ using Serientermine.Providers;
 using Serientermine.UI;
 using System.Collections.ObjectModel;
 using Hmd.Environments;
+using Microsoft.EntityFrameworkCore;
+using SerientermineErmitteln.Data.Database;
 
 namespace Serientermine.ViewModels
 {
@@ -58,9 +60,9 @@ namespace Serientermine.ViewModels
             {
                 IsBusy = true;
 
-                await Task.Delay(1000);
-
+                //await Task.Delay(1000);
                 var selected = SelectedSerie;
+
                 var provider = HmdEnvironment.GetRequiredService<ISeriesProvider>();
                 Series = new ObservableCollection<ISerie>(await provider.GetSeriesAsync(token));
                 SelectedSerie = Series.FirstOrDefault(x => x.Name == selected?.Name);

@@ -7,10 +7,10 @@ namespace Serientermine.Series
     public sealed class WeeklySerie : SerieBase
     {
         /// <summary> Liste der Wochentage, an denen der Serienttermin stattfinden soll </summary>
-        public List<string> DayList { get; set; }
+        //public List<string> DayList { get; set; }
 
         /// <inheritdoc />
-        public override SerieType Type => SerieType.Weekly;
+        public override SerieType Type1 => SerieType.Weekly;
 
         /// <inheritdoc />
         public override string IntervallDescription => $"Jede(n) {Intervall}. Woche";

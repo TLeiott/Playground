@@ -8,7 +8,7 @@ namespace Serientermine.Series
         /// <summary>
         /// Art der Serie, z.B. wöchentlich
         /// </summary>
-        SerieType Type { get; }
+        SerieType Type1 { get; }
 
         int Id { get; }
 

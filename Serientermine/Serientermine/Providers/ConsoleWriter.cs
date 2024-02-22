@@ -9,7 +9,7 @@ namespace Serientermine.Providers
         {
             ConsoleColor color;
             ConsoleColor darkColor;
-            switch (serie.Type.ToString())
+            switch (serie.Type1.ToString())
             {
                 default:
                     color = ConsoleColor.Red;
@@ -32,7 +32,7 @@ namespace Serientermine.Providers
                     darkColor = ConsoleColor.DarkMagenta;
                     break;
             }
-            UI.ConsoleWriter.LineColor($"[{serie.Type}] ({serie.Name})", darkColor);
+            UI.ConsoleWriter.LineColor($"[{serie.Type1}] ({serie.Name})", darkColor);
             UI.ConsoleWriter.Color($"Beginn der Serie: {serie.Begin:d}, End: {serie.End:d}. {serie.IntervallDescription}. Termine:");
             Console.WriteLine();
             int count = 0;

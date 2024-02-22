@@ -40,7 +40,7 @@
             </StackPanel>
             <DataGrid Grid.Row="1" ItemsSource="{Binding Series}" SelectedItem="{Binding SelectedSerie}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Typ" Width="100" Binding="{Binding Type}" />
+                    <DataGridTextColumn Header="Typ" Width="100" Binding="{Binding Type1}" />
                     <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}" />
                     <DataGridTextColumn Header="Beginn" Width="80" Binding="{Binding Begin, StringFormat=d}" />
                     <DataGridTextColumn Header="Ende" Width="80" Binding="{Binding End, StringFormat=d}" />

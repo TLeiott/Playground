@@ -8,7 +8,7 @@ namespace Serientermine.Series
     /// </summary>
     public sealed class YearlySerie : SerieBase
     {
-        public override SerieType Type => SerieType.Yearly;
+        public override SerieType Type1 => SerieType.Yearly;
 
         public override string IntervallDescription => $"Jede(n) {Intervall}. Monat";
 

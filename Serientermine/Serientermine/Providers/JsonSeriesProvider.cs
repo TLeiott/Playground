@@ -15,10 +15,12 @@ namespace Serientermine.Providers
             => Task.CompletedTask;
         public Task UpdateAsync(ISerie serie, CancellationToken token)
             => Task.CompletedTask;
+        public Task CheckDbStructureAsync(CancellationToken token)
+            => Task.CompletedTask;
 
-        public Task<List<ISerie>> GetSeriesAsync(CancellationToken token)
+        public Task<List<SerieBase>> GetSeriesAsync(CancellationToken token)
         {
-            var list = new List<ISerie>();
+            var list = new List<SerieBase>();
 
             var config = HmdEnvironment.GetRequiredService<IConfiguration>();
             var children = config.GetSection("Series").GetChildren();
@@ -33,10 +35,7 @@ namespace Serientermine.Providers
                         serie = new DailySerie();
                         break;
                     case "Weekly":
-                        serie = new WeeklySerie
-                        {
-                            DayList = GetDayList(child.GetValue<string>("Wochentage"))
-                        };
+                        serie = new WeeklySerie();
                         break;
                     case "Monthly":
                         serie = new MonthlySerie{};
