@@ -1,4 +1,3 @@
-
 using Serientermine.Series;
 
 namespace Serientermine.Test

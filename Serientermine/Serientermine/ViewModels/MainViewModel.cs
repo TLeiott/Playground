@@ -12,8 +12,6 @@ using Serientermine.Providers;
 using Serientermine.UI;
 using System.Collections.ObjectModel;
 using Hmd.Environments;
-using Microsoft.EntityFrameworkCore;
-using SerientermineErmitteln.Data.Database;
 
 namespace Serientermine.ViewModels
 {
