@@ -45,8 +45,8 @@ namespace Serientermine.ViewModels
 
             CreateCommand = new DelegateCommand(CreateSerie);
             EditCommand = new DelegateCommand(EditSerie, () => SelectedSerie != null);
-            DeleteCommand = new DelegateCommand(DeleteSerieAsync, () => SelectedSerie != null);
-            CalcCommand = new DelegateCommandAsync(CalculateAsync, () => SelectedSerie != null);
+            DeleteCommand = new DelegateCommandAsync(DeleteSerieAsync, () => SelectedSerie != null);
+            CalcCommand = new DelegateCommand(Calculate, () => SelectedSerie != null);
         }
 
         //public override Task InitializeAsync(CancellationToken token)
@@ -214,7 +214,7 @@ namespace Serientermine.ViewModels
                 return;
 
             Series.Add(serie);
-            ReloadAsync(CancellationToken.None);
+            _ = ReloadAsync(CancellationToken.None);
         }
 
         private void EditSerie()
@@ -224,33 +224,31 @@ namespace Serientermine.ViewModels
 
             DialogService.ShowEditSerieDialog(this, SelectedSerie);
             //tabaseSeriesProvider.DeleteSeriesAsync(SelectedSerie.Id);
-            ReloadAsync(CancellationToken.None);
 
-            // _ = ReloadAsync(CancellationToken.None);
+            _ = ReloadAsync(CancellationToken.None);
         }
 
-        private async void DeleteSerieAsync()
+        private async Task DeleteSerieAsync()
         {
             if (SelectedSerie == null)
                 return;
             await DatabaseSeriesProvider.DeleteSeriesAsync(SelectedSerie.Id);
-            ReloadAsync(CancellationToken.None);
-            //WEITER: Hier ist das Problem, bessergasgt warscheinlich der ansatz zur lösung. Das Löschen funktioniert noch nicht. und wenn man eine Serie bearbeitet, dann wird die neue Version zwar gespeichert, aber das alte nicht gelösch oder überschrieben. 
+            await ReloadAsync(default);
         }
 
-        private Task CalculateAsync(CancellationToken token)
+        private void Calculate()
         {
 
             if (SelectedSerie == null)
-                return Task.CompletedTask;
+                return;
 
             try
             {
                 IsBusy = true;
 
                 CalculatedSerieName = SelectedSerie.Name;
-                CalculatedSerieCount = SelectedSerie.GetDatesInRange(_rangeStart, _rangeEnd).Count();
                 CalculatedDates = SelectedSerie.GetDatesInRange(_rangeStart, _rangeEnd).ToList();
+                CalculatedSerieCount = CalculatedDates.Count;
 
                 DialogService.ShowDialogHmdMessageBox(this, "Werte wurden berechnet.", "Berechnung",
                     HmdDialogIcon.Information);
@@ -263,8 +261,6 @@ namespace Serientermine.ViewModels
             {
                 IsBusy = false;
             }
-
-            return Task.CompletedTask;
         }
     }
 }

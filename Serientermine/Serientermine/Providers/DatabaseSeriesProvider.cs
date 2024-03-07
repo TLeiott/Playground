@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Hmd.Environments;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Serientermine.Series;

@@ -115,6 +115,7 @@ namespace Serientermine.ViewModels
                 {
                     IsWeekdayEnabled = false;
                 }
+
                 if (value == "Daily" || value == "Weekly")
                 {
                     IsDayOfMonthEnabled = false;
@@ -155,6 +156,9 @@ namespace Serientermine.ViewModels
         protected override void ValidateAll()
         {
             SetFieldValidationErrors(ValidateWeekDay(), nameof(WeekDay));
+            SetFieldValidationErrors(ValidateIntervall(), nameof(Intervall));
+            SetFieldValidationErrors(ValidateName(), nameof(Name));
+            SetFieldValidationErrors(ValidateMonthDay(), nameof(MonthDay));
         }
 
         private IEnumerable<string> ValidateWeekDay()
@@ -163,12 +167,29 @@ namespace Serientermine.ViewModels
                 yield return "Es muss ein Wochentag ausgewählt werden.";
         }
 
+        private IEnumerable<string> ValidateIntervall()
+        {
+            if (Intervall < 1 || Intervall.ToString() == "")
+                yield return "Intervall muss >0 sein.";
+        }
+
+        private IEnumerable<string> ValidateName()
+        {
+            if (string.IsNullOrWhiteSpace(Name))
+                yield return "Ein Name muss angegeben sein.";
+        }
+        private IEnumerable<string> ValidateMonthDay()
+        {
+            if (MonthDay < 1 && (SelectedSerieType == "Monthly" || SelectedSerieType == "Yearly"))
+                yield return "Tag des Monats muss >0 sein";
+        }
+
         protected override Task<(bool, string)> SavingAsync(CancellationToken token)
         {
             SerieBase serieBase = _serie as SerieBase;
             if (IsCreateMode)
             {
-                switch (_selectedSerieType.ToString())
+                switch (_selectedSerieType?.ToString())
                 {
                     case "Daily":
                         serieBase = new DailySerie();
@@ -183,23 +204,9 @@ namespace Serientermine.ViewModels
                         serieBase = new YearlySerie();
                         break;
                     default:
-                        throw new NotSupportedException($"Der Serientyp '{_serie.Type1}' ist noch nicht implementiert.");
+                        throw new NotSupportedException($"Der Serientyp '{_selectedSerieType}' ist noch nicht implementiert.");
                 }
             }
-
-            if (Intervall < 1 || Intervall.ToString() == "")
-            {
-                return Task.FromResult((false, "Intervall muss >0 sein."));
-            }
-            if (Name.Length < 1 || Name == "")
-            {
-                return Task.FromResult((false, "Ein Name muss angegeben sein."));
-            }
-            if (MonthDay < 1 && (SelectedSerieType == "Monthly" || SelectedSerieType == "Yearly"))
-            {
-                return Task.FromResult((false, "Tag des Monats muss >0 sein"));
-            }
-
 
             //serieBase.Name = Name
             serieBase.Begin = SerieStart;
