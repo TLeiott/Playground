@@ -64,12 +64,25 @@ namespace Serientermine.ViewModels
         public int Intervall
         {
             get => _intervall;
-            set => SetProperty(ref _intervall, value);
+            set
+            {
+                if (!SetProperty(ref _monthDay, value))
+                    return;
+
+                SetFieldValidationErrors(ValidateIntervall());
+            }
         }
         public int MonthDay
         {
             get => _monthDay;
-            set => SetProperty(ref _monthDay, value);
+            set
+            {
+                if (!SetProperty(ref _monthDay, value))
+                    return;
+
+                SetFieldValidationErrors(ValidateMonthDay());
+                SetFieldValidationErrors(ValidateWeekDay(), nameof(WeekDay));
+            }
         }
         public int Month
         {
@@ -84,7 +97,10 @@ namespace Serientermine.ViewModels
         public string Name
         {
             get => _name;
-            set => SetProperty(ref _name, value);
+            set {
+                SetProperty(ref _name, value);
+                SetFieldValidationErrors(ValidateName());
+            }
         }
 
         public string WeekDay
@@ -96,6 +112,7 @@ namespace Serientermine.ViewModels
                     return;
 
                 SetFieldValidationErrors(ValidateWeekDay());
+                SetFieldValidationErrors(ValidateMonthDay(), nameof(MonthDay));
             }
         }
 
@@ -155,22 +172,24 @@ namespace Serientermine.ViewModels
 
         protected override void ValidateAll()
         {
-            SetFieldValidationErrors(ValidateWeekDay(), nameof(WeekDay));
+            SetFieldValidationErrors(ValidateWeekDay());
             SetFieldValidationErrors(ValidateIntervall(), nameof(Intervall));
             SetFieldValidationErrors(ValidateName(), nameof(Name));
-            SetFieldValidationErrors(ValidateMonthDay(), nameof(MonthDay));
+            SetFieldValidationErrors(ValidateMonthDay());
         }
 
         private IEnumerable<string> ValidateWeekDay()
         {
-            if (string.IsNullOrWhiteSpace(WeekDay) && SelectedSerieType == "Weekly")
+            if (SelectedSerieType == "Weekly" && string.IsNullOrWhiteSpace(WeekDay))
                 yield return "Es muss ein Wochentag ausgewählt werden.";
+            if ((SelectedSerieType == "Monthly" || SelectedSerieType == "Yearly") && WeekDay != ""&&MonthDay>5)
+                yield return "Tag des Monats ist zu groß um ein Wochentag anzugeben";
         }
 
         private IEnumerable<string> ValidateIntervall()
         {
             if (Intervall < 1 || Intervall.ToString() == "")
-                yield return "Intervall muss >0 sein.";
+                yield return "Intervall muss mindestens 1 Betragen.";
         }
 
         private IEnumerable<string> ValidateName()
@@ -182,6 +201,8 @@ namespace Serientermine.ViewModels
         {
             if (MonthDay < 1 && (SelectedSerieType == "Monthly" || SelectedSerieType == "Yearly"))
                 yield return "Tag des Monats muss >0 sein";
+            if ((SelectedSerieType == "Monthly" || SelectedSerieType == "Yearly") && WeekDay != "" && MonthDay > 5)
+                yield return "Tag des Monats muss kleiner sein um ein Wochentag anzugeben";
         }
 
         protected override Task<(bool, string)> SavingAsync(CancellationToken token)
