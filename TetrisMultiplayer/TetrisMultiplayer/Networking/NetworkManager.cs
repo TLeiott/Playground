@@ -748,5 +748,61 @@ namespace TetrisMultiplayer.Networking
                 LogDebugToFile($"Error in ClientReceiveLoop: {ex.Message}");
             }
         }
+
+        // Client: Wait for PrepareNextPiece message
+        public Task<bool> ReceivePrepareNextPieceAsync(CancellationToken cancellationToken)
+        {
+            lock (_queueLock)
+            {
+                var tempQueue = new Queue<JsonElement>();
+                while (_clientMessageQueue.Count > 0)
+                {
+                    var queuedElement = _clientMessageQueue.Dequeue();
+                    if (queuedElement.TryGetProperty("type", out var qTypeProp) && qTypeProp.GetString() == "PrepareNextPiece")
+                    {
+                        // Put back remaining messages
+                        while (tempQueue.Count > 0)
+                            _clientMessageQueue.Enqueue(tempQueue.Dequeue());
+                        return Task.FromResult(true);
+                    }
+                    tempQueue.Enqueue(queuedElement);
+                }
+                // Put back all messages
+                while (tempQueue.Count > 0)
+                    _clientMessageQueue.Enqueue(tempQueue.Dequeue());
+            }
+            return Task.FromResult(false);
+        }
+
+        // Client: Wait for WaitForNextRound message  
+        public Task<string?> ReceiveWaitForNextRoundAsync(CancellationToken cancellationToken)
+        {
+            lock (_queueLock)
+            {
+                var tempQueue = new Queue<JsonElement>();
+                while (_clientMessageQueue.Count > 0)
+                {
+                    var queuedElement = _clientMessageQueue.Dequeue();
+                    if (queuedElement.TryGetProperty("type", out var qTypeProp) && qTypeProp.GetString() == "WaitForNextRound")
+                    {
+                        // Put back remaining messages
+                        while (tempQueue.Count > 0)
+                            _clientMessageQueue.Enqueue(tempQueue.Dequeue());
+                        
+                        string message = "Waiting for next round...";
+                        if (queuedElement.TryGetProperty("message", out var msgProp))
+                        {
+                            message = msgProp.GetString() ?? message;
+                        }
+                        return Task.FromResult<string?>(message);
+                    }
+                    tempQueue.Enqueue(queuedElement);
+                }
+                // Put back all messages
+                while (tempQueue.Count > 0)
+                    _clientMessageQueue.Enqueue(tempQueue.Dequeue());
+            }
+            return Task.FromResult<string?>(null);
+        }
     }
 }

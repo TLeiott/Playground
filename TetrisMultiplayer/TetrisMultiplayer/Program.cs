@@ -338,7 +338,7 @@ namespace TetrisMultiplayer
                         break;
                     }
 
-                    // Reset round placement state
+                    // Reset round placement state - CRITICAL for synchronization
                     playersWhoPlaced.Clear();
 
                     // Track deleted rows per player for THIS round
@@ -346,9 +346,16 @@ namespace TetrisMultiplayer
                     foreach (var id in playerIds)
                         deletedRowsPerPlayer[id] = 0;
 
+                    // SYNCHRONIZATION FIX: Send "PrepareNextPiece" first to let all players know a new round is starting
+                    var prepareMsg = new { type = "PrepareNextPiece", round = round };
+                    await network.BroadcastAsync(prepareMsg);
+                    
+                    // Brief delay to ensure all players receive the prepare message
+                    await Task.Delay(100);
+
                     // CRITICAL: Get piece from centralized GameManager for synchronization
                     int pieceId = gameManager.GetNextPiece();
-                    var nextPiece = new { type = "NextPiece", pieceId };
+                    var nextPiece = new { type = "NextPiece", pieceId, round = round };
                     await network.BroadcastAsync(nextPiece);
                     logger.LogInformation($"[Host] Runde {round}: Sende Piece {pieceId} an alle (Seed: {gameManager.Seed})");
 
@@ -466,8 +473,8 @@ namespace TetrisMultiplayer
                         TetrisMultiplayer.UI.ConsoleUI.DrawGameWithLeaderboard(hostEngine, localLeaderboard2, hostId, "HOST PIECE PLACED - WAITING FOR CLIENTS...", playerNames, playersWhoPlaced);
                     }
 
-                    // Warte auf PlacedPiece von allen Clients oder Timeout - now much faster!
-                    var placedPieces = await WaitForPlacedPieces(network, network.ConnectedPlayerIds.ToList(), 8000, logger, cancellationToken, hps, spectators, playersWhoPlaced);
+                    // Warte auf PlacedPiece von allen Clients oder Timeout - INCREASED timeout for proper synchronization
+                    var placedPieces = await WaitForPlacedPieces(network, network.ConnectedPlayerIds.ToList(), 15000, logger, cancellationToken, hps, spectators, playersWhoPlaced);
 
                     // Process client pieces using reported deltas (no host-side simulation)
                     foreach (var placedPiece in placedPieces)
@@ -525,16 +532,25 @@ namespace TetrisMultiplayer
                     };
                     await network.BroadcastAsync(roundResults);
                     
-                    // If all active players have placed, no need to wait long
+                    // SYNCHRONIZATION FIX: Ensure ALL players wait before next round starts
+                    logger.LogInformation($"[Host] Round {round} complete. Waiting for all players to be ready for next round...");
+                    
+                    // Send a "WaitForNextRound" message to all players to ensure synchronization
+                    var waitMsg = new { type = "WaitForNextRound", round = round, message = "Round complete - preparing next round..." };
+                    await network.BroadcastAsync(waitMsg);
+                    
+                    // Wait longer to ensure all players process the round results and are ready
                     var activeCount = playerIds.Count(id => !spectators.Contains(id));
                     if (playersWhoPlaced.Count >= activeCount)
                     {
-                        await Task.Delay(400); // quick pause when all finished
+                        await Task.Delay(1500); // Longer pause to ensure synchronization when all finished
                     }
                     else
                     {
-                        await Task.Delay(1500); // allow more UI time if some timed out
+                        await Task.Delay(2500); // Even longer when some players timed out
                     }
+                    
+                    logger.LogInformation($"[Host] Starting round {round + 1} with {activeCount} active players");
                     round++;
                 }
             }
@@ -980,7 +996,24 @@ namespace TetrisMultiplayer
                                             break; // Break out of the piece loop, continue in spectator mode
                                         }
                                         
-                                        await Task.Delay(1000); // Brief pause before next piece
+                                        // SYNCHRONIZATION FIX: Wait for host's "WaitForNextRound" message before proceeding
+                                        GameLogger.LogDebug($"[Client] Waiting for synchronization message from host...");
+                                        TetrisMultiplayer.UI.ConsoleUI.DrawGameWithLeaderboard(engine, roundLeaderboard, playerId, "SYNCHRONIZING - WAITING FOR ALL PLAYERS...", realtimePlayerNames, completedPlayers);
+                                        
+                                        // Wait for the host's synchronization message
+                                        while (!cancellationToken.IsCancellationRequested)
+                                        {
+                                            var waitMsg = await network.ReceiveWaitForNextRoundAsync(cancellationToken);
+                                            if (waitMsg != null)
+                                            {
+                                                GameLogger.LogDebug($"[Client] Received synchronization message: {waitMsg}");
+                                                TetrisMultiplayer.UI.ConsoleUI.DrawGameWithLeaderboard(engine, roundLeaderboard, playerId, waitMsg, realtimePlayerNames, completedPlayers);
+                                                break;
+                                            }
+                                            await Task.Delay(100, cancellationToken);
+                                        }
+                                        
+                                        await Task.Delay(500); // Brief pause after synchronization
                                         break; // CRITICAL: Break out of the waiting loop to continue to next piece
                                     }
                                     else
@@ -1034,36 +1067,28 @@ namespace TetrisMultiplayer
 
         public static async Task BroadcastRealtimeLeaderboard(NetworkManager network, Dictionary<string, int> scores, Dictionary<string, int> hps, HashSet<string> spectators, Dictionary<string, string> playerNames, HashSet<string> playersWhoPlaced, CancellationToken cancellationToken)
         {
-            // Alive players: scores und hp > 0
-            var alivePlayers = scores.Keys.Where(id => hps.ContainsKey(id) && hps[id] > 0).ToList();
+            // Send ALL players, not just top 3, to fix the "some players only see themselves" issue
+            var allPlayers = scores.Keys.ToList();
             
-            // Sortiere nach Punktestand (höchste zuerst), dann nach HP (höchste zuerst)
-            var sortedPlayers = alivePlayers
-                .Select(id => new { Id = id, Score = scores[id], HP = hps[id], IsSpectator = spectators.Contains(id) })
-                .OrderByDescending(p => p.Score)
-                .ThenByDescending(p => p.HP)
-                .ToList();
-            
-            // Top 3 oder weniger senden
-            var topPlayers = sortedPlayers.Take(3).ToList();
-            
+            // Prepare data in the format expected by ParseLeaderboardUpdate
             var leaderboardUpdate = new { 
                 type = "LeaderboardUpdate", 
-                players = topPlayers.Select(p => new { 
-                    id = p.Id, 
-                    score = p.Score, 
-                    hp = p.HP, 
-                    isSpectator = p.IsSpectator 
-                }).ToList(),
+                scores = scores,                    // Flat scores dictionary
+                hp = hps,                          // Flat hp dictionary  
+                spectators = spectators.ToList(),  // Flat spectators list
+                playerNames = playerNames,          // Player names dictionary
                 playersPlaced = playersWhoPlaced.ToList()
             };
             await network.BroadcastAsync(leaderboardUpdate);
             
-            // Logge ausführliche Informationen zum Leaderboard
-            foreach (var player in topPlayers)
+            // Logge ausführliche Informationen zum Leaderboard für alle Spieler
+            foreach (var playerId in allPlayers)
             {
-                var status = player.IsSpectator ? "Spectator" : "Player";
-                GameLogger.LogDebug($"[Leaderboard] {status} {player.Id}: Score={player.Score}, HP={player.HP}");
+                var status = spectators.Contains(playerId) ? "Spectator" : "Player";
+                var score = scores.GetValueOrDefault(playerId, 0);
+                var hp = hps.GetValueOrDefault(playerId, 100);
+                var placed = playersWhoPlaced.Contains(playerId) ? "PLACED" : "waiting";
+                GameLogger.LogDebug($"[Leaderboard] {status} {playerId}: Score={score}, HP={hp}, Status={placed}");
             }
         }
 
@@ -1129,15 +1154,15 @@ namespace TetrisMultiplayer
             
             logger.LogInformation($"[Host] Waiting for PlacedPiece from {activePlayers.Count} active players: {string.Join(", ", activePlayers)}");
             
-            // Much more aggressive timeout - start with 5 seconds instead of 15
-            int adaptiveTimeout = Math.Min(timeoutMs, 5000);
+            // More reasonable timeout for synchronization - start with 10 seconds instead of 5
+            int adaptiveTimeout = Math.Min(timeoutMs, 10000);
             
             while ((DateTime.UtcNow - start).TotalMilliseconds < adaptiveTimeout && received.Count < activePlayers.Count && !cancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    // Reduced timeout per attempt for faster responsiveness
-                    var msg = await network.ReceivePlacedPieceAsync(cancellationToken, 1000);
+                    // Reasonable timeout per attempt for synchronization
+                    var msg = await network.ReceivePlacedPieceAsync(cancellationToken, 2000);
                     if (msg != null && !received.Contains(msg.PlayerId) && activePlayers.Contains(msg.PlayerId))
                     {
                         results.Add(msg);
