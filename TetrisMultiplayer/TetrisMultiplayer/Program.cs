@@ -130,13 +130,6 @@ namespace TetrisMultiplayer
     {
         static void Main(string[] args)
         {
-            // Check if we're running tests
-            if (args.Length > 0 && args[0].ToLower() == "test")
-            {
-                RunTests();
-                return;
-            }
-            
             // Ensure required directories exist
             string[] requiredDirs = { "Networking", "Game", "UI", "Model", "Persistence" };
             foreach (var dir in requiredDirs)
@@ -1098,7 +1091,7 @@ namespace TetrisMultiplayer
             return jaggedArray;
         }
 
-        public static bool JaggedArrayEquals(int[][] a, int[][] b)
+        public static bool JaggedArrayEquals(int[][]? a, int[][]? b)
         {
             if (a == null && b == null) return true;
             if (a == null || b == null) return false;

@@ -7,7 +7,6 @@ namespace TetrisMultiplayer.UI
     public class ConsoleUI
     {
         private static int[,]? _lastRenderedGrid;
-        private static Tetromino? _lastRenderedPiece;
         private static int _lastScore = -1;
         private static string _lastStatusMsg = "";
         private static List<(string Name, int Score, int Hp, bool IsSpectator)>? _lastLeaderboard;
@@ -327,7 +326,6 @@ namespace TetrisMultiplayer.UI
         public static void ResetUI()
         {
             _lastRenderedGrid = null;
-            _lastRenderedPiece = null;
             _lastScore = -1;
             _lastStatusMsg = "";
             _lastLeaderboard = null;

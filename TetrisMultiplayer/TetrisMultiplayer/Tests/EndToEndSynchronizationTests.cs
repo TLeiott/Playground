@@ -17,10 +17,11 @@ namespace TetrisMultiplayer.Tests
             dto.Spectators.Add("player1");
             dto.Spectators.Add("player2");
             
-            Assert.True(dto.Spectators.Contains("player1"));
-            Assert.True(dto.Spectators.Contains("player2"));
-            Assert.False(dto.Spectators.Contains("player3"));
-            Assert.False(dto.Spectators.Contains(null));
+            Assert.Contains("player1", dto.Spectators);
+            Assert.Contains("player2", dto.Spectators);
+            Assert.DoesNotContain("player3", dto.Spectators);
+            // Verify list doesn't contain null values
+            Assert.DoesNotContain(dto.Spectators, item => item == null);
         }
         
         [Fact]

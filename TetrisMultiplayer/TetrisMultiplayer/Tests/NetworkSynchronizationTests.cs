@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using TetrisMultiplayer.Networking;
 using Microsoft.Extensions.Logging;
 
@@ -8,7 +7,7 @@ namespace TetrisMultiplayer.Tests
 {
     public class NetworkSynchronizationTests
     {
-        public static async Task TestLeaderboardSynchronization()
+        public static void TestLeaderboardSynchronization()
         {
             // Test leaderboard update message parsing
             var networkManager = new NetworkManager();
