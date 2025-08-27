@@ -158,12 +158,12 @@ namespace TetrisMultiplayer
             }
 
             // Ask for mode
-            Console.WriteLine("Bitte Modus wählen: host (h) oder client (c):");
+            Console.WriteLine("Bitte Modus wählen: host (h), client (c), oder test (t):");
             string? modeInput = Console.ReadLine();
             string mode = (modeInput ?? string.Empty).Trim().ToLower();
-            while (mode != "host" && mode != "h" && mode != "client" && mode != "c")
+            while (mode != "host" && mode != "h" && mode != "client" && mode != "c" && mode != "test" && mode != "t")
             {
-                Console.WriteLine("Ungültige Eingabe. Bitte 'host' (h) oder 'client' (c) eingeben:");
+                Console.WriteLine("Ungültige Eingabe. Bitte 'host' (h), 'client' (c) oder 'test' (t) eingeben:");
                 modeInput = Console.ReadLine();
                 mode = (modeInput ?? string.Empty).Trim().ToLower();
             }
@@ -177,6 +177,11 @@ namespace TetrisMultiplayer
             {
                 logger.LogInformation("Starte im Client-Modus...");
                 RunClientAsync(logger, playerName).GetAwaiter().GetResult();
+            }
+            else if (mode == "test" || mode == "t")
+            {
+                logger.LogInformation("Starte Test-Modus...");
+                TetrisMultiplayer.Tests.PreviewOptimizationTest.RunManualTest();
             }
             else
             {

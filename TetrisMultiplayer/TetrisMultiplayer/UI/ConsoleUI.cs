@@ -11,6 +11,10 @@ namespace TetrisMultiplayer.UI
         private static string _lastStatusMsg = "";
         private static List<(string Name, int Score, int Hp, bool IsSpectator)>? _lastLeaderboard;
         private static bool _isInitialized = false;
+        
+        // Preview optimization caches
+        private static TetrominoType? _lastPreviewType = null;
+        private static int[,]? _lastPreviewGrid = null;
 
         public static void RunSinglePlayer()
         {
@@ -35,24 +39,12 @@ namespace TetrisMultiplayer.UI
                 }
 
                 DrawField(engine);
-                // Draw next piece preview (4x4 grid)
+                // Draw next piece preview (4x4 grid) - optimized
                 int previewLeft = TetrisEngine.Width * 2 + 6;
-                int previewTop = 2;
-                Console.SetCursorPosition(previewLeft, previewTop);
+                int previewTop = 3; // Start after "Next:" label
+                Console.SetCursorPosition(previewLeft, 2);
                 Console.Write("Next:");
-                int previewSize = 4;
-                int[,] preview = new int[previewSize, previewSize];
-                foreach (var (x, y) in engine.Next.Blocks(1, 1, 0)) // Centered in 4x4
-                {
-                    if (x >= 0 && x < previewSize && y >= 0 && y < previewSize)
-                        preview[y, x] = (int)engine.Next.Type + 1;
-                }
-                for (int py = 0; py < previewSize; py++)
-                {
-                    Console.SetCursorPosition(previewLeft, previewTop + 1 + py);
-                    for (int px = 0; px < previewSize; px++)
-                        Console.Write(preview[py, px] == 0 ? "  " : "[]");
-                }
+                DrawOptimizedPreview(engine.Next, previewLeft, previewTop);
                 Console.SetCursorPosition(0, TetrisEngine.Height + 2);
                 Console.WriteLine($"Score: {engine.Score}");
                 Console.WriteLine($"Next: {engine.Next.Type}");
@@ -213,24 +205,12 @@ namespace TetrisMultiplayer.UI
                 Console.Write("+" + new string('-', w * 2) + "+");
             }
 
-            // Draw next piece preview (4x4 grid)
+            // Draw next piece preview (4x4 grid) - optimized
             if (engine.Next != null)
             {
                 Console.SetCursorPosition(nextPieceLeft, fieldTop);
                 Console.Write("Next:");
-                int previewSize = 4;
-                int[,] preview = new int[previewSize, previewSize];
-                foreach (var (x, y) in engine.Next.Blocks(1, 1, 0)) // Centered in 4x4
-                {
-                    if (x >= 0 && x < previewSize && y >= 0 && y < previewSize)
-                        preview[y, x] = (int)engine.Next.Type + 1;
-                }
-                for (int py = 0; py < previewSize; py++)
-                {
-                    Console.SetCursorPosition(nextPieceLeft, nextPieceTop + py);
-                    for (int px = 0; px < previewSize; px++)
-                        Console.Write(preview[py, px] == 0 ? "  " : "[]");
-                }
+                DrawOptimizedPreview(engine.Next, nextPieceLeft, nextPieceTop);
             }
 
             // Update score only if changed
@@ -323,6 +303,59 @@ namespace TetrisMultiplayer.UI
             return true;
         }
 
+        private static (int x, int y) GetPieceCenterPosition(TetrominoType type)
+        {
+            // Optimized centering for each piece type in a 4x4 grid
+            return type switch
+            {
+                TetrominoType.I => (1, 1), // I-piece needs special positioning
+                TetrominoType.O => (1, 1), // O-piece is 2x2, center at 1,1
+                TetrominoType.T => (1, 1), // T-piece centers well at 1,1
+                TetrominoType.S => (1, 1), // S-piece centers well at 1,1
+                TetrominoType.Z => (1, 1), // Z-piece centers well at 1,1
+                TetrominoType.J => (1, 1), // J-piece centers well at 1,1
+                TetrominoType.L => (1, 1), // L-piece centers well at 1,1
+                _ => (1, 1)
+            };
+        }
+        
+        private static void DrawOptimizedPreview(Tetromino nextPiece, int previewLeft, int previewTop)
+        {
+            int previewSize = 4;
+            
+            // Only redraw if the next piece has changed
+            if (nextPiece != null && (_lastPreviewType != nextPiece.Type || _lastPreviewGrid == null))
+            {
+                // Clear preview area first
+                for (int py = 0; py < previewSize; py++)
+                {
+                    Console.SetCursorPosition(previewLeft, previewTop + py);
+                    Console.Write(new string(' ', previewSize * 2));
+                }
+                
+                // Create and cache new preview
+                _lastPreviewGrid = new int[previewSize, previewSize];
+                _lastPreviewType = nextPiece.Type;
+                
+                // Get better centering position for different piece types
+                var (centerX, centerY) = GetPieceCenterPosition(nextPiece.Type);
+                
+                foreach (var (x, y) in nextPiece.Blocks(centerX, centerY, 0))
+                {
+                    if (x >= 0 && x < previewSize && y >= 0 && y < previewSize)
+                        _lastPreviewGrid[y, x] = (int)nextPiece.Type + 1;
+                }
+                
+                // Draw the cached preview
+                for (int py = 0; py < previewSize; py++)
+                {
+                    Console.SetCursorPosition(previewLeft, previewTop + py);
+                    for (int px = 0; px < previewSize; px++)
+                        Console.Write(_lastPreviewGrid[py, px] == 0 ? "  " : "[]");
+                }
+            }
+        }
+
         public static void ResetUI()
         {
             _lastRenderedGrid = null;
@@ -330,6 +363,9 @@ namespace TetrisMultiplayer.UI
             _lastStatusMsg = "";
             _lastLeaderboard = null;
             _isInitialized = false;
+            // Reset preview cache
+            _lastPreviewType = null;
+            _lastPreviewGrid = null;
         }
 
         public static void DrawFieldRaw(int[,] grid)

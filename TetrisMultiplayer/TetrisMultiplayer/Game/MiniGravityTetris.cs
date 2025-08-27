@@ -12,6 +12,10 @@ namespace TetrisMultiplayer.Game
         private Random rng = new Random();
         private bool running = true;
         private bool paused = false;
+        
+        // Preview optimization - cache the last drawn preview
+        private TetrominoType? lastPreviewType = null;
+        private int[,]? lastPreviewGrid = null;
 
         public void Run()
         {
@@ -50,6 +54,9 @@ namespace TetrisMultiplayer.Game
             // Always generate both pieces on reset
             currentPiece = GenerateTetrominoAtEdge();
             nextPiece = GenerateTetrominoAtEdge();
+            // Invalidate preview cache on reset
+            lastPreviewType = null;
+            lastPreviewGrid = null;
         }
 
         private Tetromino GenerateTetrominoAtEdge()
@@ -106,6 +113,9 @@ namespace TetrisMultiplayer.Game
                     // Always generate a new nextPiece and move it to currentPiece
                     currentPiece = nextPiece;
                     nextPiece = GenerateTetrominoAtEdge();
+                    // Invalidate preview cache when next piece changes
+                    lastPreviewType = null;
+                    lastPreviewGrid = null;
                 }
             }
         }
@@ -120,36 +130,71 @@ namespace TetrisMultiplayer.Game
             return true;
         }
 
-        private void Draw()
+        private void DrawNextPiecePreview()
         {
-            Console.SetCursorPosition(0, 0);
-            // Draw next piece preview (4x4)
             int previewLeft = Size * 2 + 4;
             int previewTop = 1;
-            Console.SetCursorPosition(previewLeft, previewTop);
-            Console.Write("Next:");
             int previewSize = 4;
-            // Clear preview area first
-            for (int py = 0; py < previewSize; py++)
+            
+            // Only redraw if the next piece has changed
+            if (nextPiece != null && (lastPreviewType != nextPiece.Type || lastPreviewGrid == null))
             {
-                Console.SetCursorPosition(previewLeft, previewTop + 1 + py);
-                Console.Write(new string(' ', previewSize * 2));
-            }
-            int[,] preview = new int[previewSize, previewSize];
-            if (nextPiece != null)
-            {
-                foreach (var (x, y) in nextPiece.Blocks(1, 1, 0))
+                // Clear preview area first
+                for (int py = 0; py < previewSize; py++)
+                {
+                    Console.SetCursorPosition(previewLeft, previewTop + 1 + py);
+                    Console.Write(new string(' ', previewSize * 2));
+                }
+                
+                // Create and cache new preview
+                lastPreviewGrid = new int[previewSize, previewSize];
+                lastPreviewType = nextPiece.Type;
+                
+                // Get better centering position for different piece types
+                var (centerX, centerY) = GetPieceCenterPosition(nextPiece.Type);
+                
+                foreach (var (x, y) in nextPiece.Blocks(centerX, centerY, 0))
                 {
                     if (x >= 0 && x < previewSize && y >= 0 && y < previewSize)
-                        preview[y, x] = (int)nextPiece.Type + 1;
+                        lastPreviewGrid[y, x] = (int)nextPiece.Type + 1;
                 }
+                
+                // Draw the cached preview
                 for (int py = 0; py < previewSize; py++)
                 {
                     Console.SetCursorPosition(previewLeft, previewTop + 1 + py);
                     for (int px = 0; px < previewSize; px++)
-                        Console.Write(preview[py, px] == 0 ? "  " : "[]");
+                        Console.Write(lastPreviewGrid[py, px] == 0 ? "  " : "[]");
                 }
             }
+        }
+        
+        private (int x, int y) GetPieceCenterPosition(TetrominoType type)
+        {
+            // Optimized centering for each piece type in a 4x4 grid
+            return type switch
+            {
+                TetrominoType.I => (1, 1), // I-piece needs special positioning
+                TetrominoType.O => (1, 1), // O-piece is 2x2, center at 1,1
+                TetrominoType.T => (1, 1), // T-piece centers well at 1,1
+                TetrominoType.S => (1, 1), // S-piece centers well at 1,1
+                TetrominoType.Z => (1, 1), // Z-piece centers well at 1,1
+                TetrominoType.J => (1, 1), // J-piece centers well at 1,1
+                TetrominoType.L => (1, 1), // L-piece centers well at 1,1
+                _ => (1, 1)
+            };
+        }
+
+        private void Draw()
+        {
+            Console.SetCursorPosition(0, 0);
+            // Draw next piece preview (4x4) - only if changed
+            int previewLeft = Size * 2 + 4;
+            int previewTop = 1;
+            Console.SetCursorPosition(previewLeft, previewTop);
+            Console.Write("Next:");
+            
+            DrawNextPiecePreview();
             // Draw field
             for (int y = 0; y < Size; y++)
             {
