@@ -158,12 +158,12 @@ namespace TetrisMultiplayer
             }
 
             // Ask for mode
-            Console.WriteLine("Bitte Modus wählen: host (h) oder client (c):");
+            Console.WriteLine("Bitte Modus wählen: host (h), client (c), test (t), oder validate (v):");
             string? modeInput = Console.ReadLine();
             string mode = (modeInput ?? string.Empty).Trim().ToLower();
-            while (mode != "host" && mode != "h" && mode != "client" && mode != "c")
+            while (mode != "host" && mode != "h" && mode != "client" && mode != "c" && mode != "test" && mode != "t" && mode != "validate" && mode != "v")
             {
-                Console.WriteLine("Ungültige Eingabe. Bitte 'host' (h) oder 'client' (c) eingeben:");
+                Console.WriteLine("Ungültige Eingabe. Bitte 'host' (h), 'client' (c), 'test' (t) oder 'validate' (v) eingeben:");
                 modeInput = Console.ReadLine();
                 mode = (modeInput ?? string.Empty).Trim().ToLower();
             }
@@ -178,6 +178,16 @@ namespace TetrisMultiplayer
                 logger.LogInformation("Starte im Client-Modus...");
                 RunClientAsync(logger, playerName).GetAwaiter().GetResult();
             }
+            else if (mode == "test" || mode == "t")
+            {
+                logger.LogInformation("Starte Test-Modus...");
+                TetrisMultiplayer.Tests.PreviewOptimizationTest.RunManualTest();
+            }
+            else if (mode == "validate" || mode == "v")
+            {
+                logger.LogInformation("Starte Validierungs-Modus...");
+                TetrisMultiplayer.Tests.PreviewValidationTest.ValidateOptimizations();
+            }
             else
             {
                 // Einzelspieler-Modus
@@ -186,7 +196,15 @@ namespace TetrisMultiplayer
             }
 
             Console.WriteLine("Programm beendet. Beliebige Taste zum Schließen.");
-            Console.ReadKey();
+            // Only try to read key if in interactive mode
+            try
+            {
+                Console.ReadKey();
+            }
+            catch (InvalidOperationException)
+            {
+                // Ignore error when running in non-interactive mode (tests, CI, etc.)
+            }
         }
 
         static async Task RunHostAsync(ILogger logger, string playerName)
