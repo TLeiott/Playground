@@ -252,33 +252,38 @@ namespace TetrisMultiplayer
                 Console.WriteLine("Drücke [S] um das Spiel zu starten oder [Q] zum Beenden.");
                 // Broadcast LobbyUpdate (inkl. Namen)
                 await BroadcastLobbyUpdate(network, null, null, playerNames);
-                var key = Console.ReadKey(true);
-                if (key.Key == ConsoleKey.S)
+                
+                // Check for key press non-blocking to allow lobby refresh
+                if (Console.KeyAvailable)
                 {
-                    if (playerCount < 2)
+                    var key = Console.ReadKey(true);
+                    if (key.Key == ConsoleKey.S)
                     {
-                        Console.WriteLine("Nicht genug Spieler. Mindestens 2 Spieler (inkl. Host) erforderlich.");
-                        await Task.Delay(1500);
-                        continue;
+                        if (playerCount < 2)
+                        {
+                            Console.WriteLine("Nicht genug Spieler. Mindestens 2 Spieler (inkl. Host) erforderlich.");
+                            await Task.Delay(1500);
+                            continue;
+                        }
+                        // StartGame und Seed an alle senden
+                        var startGame = new { type = "StartGame", seed };
+                        await network.BroadcastAsync(startGame);
+                        
+                        // Wait a moment for all clients to initialize their GameManagers
+                        await Task.Delay(2000);
+                        
+                        logger.LogInformation($"Spiel wird gestartet... (Seed: {seed})");
+                        // Starte lock-step Game-Loop — pieces are sent from inside the loop only
+                        await HostGameLoop(network, gameManager, logger, cts.Token, playerName, hostId, playerNames);
+                        break;
                     }
-                    // StartGame und Seed an alle senden
-                    var startGame = new { type = "StartGame", seed };
-                    await network.BroadcastAsync(startGame);
-                    
-                    // Wait a moment for all clients to initialize their GameManagers
-                    await Task.Delay(2000);
-                    
-                    logger.LogInformation($"Spiel wird gestartet... (Seed: {seed})");
-                    // Starte lock-step Game-Loop — pieces are sent from inside the loop only
-                    await HostGameLoop(network, gameManager, logger, cts.Token, playerName, hostId, playerNames);
-                    break;
+                    if (key.Key == ConsoleKey.Q)
+                    {
+                        cts.Cancel();
+                        break;
+                    }
                 }
-                if (key.Key == ConsoleKey.Q)
-                {
-                    cts.Cancel();
-                    break;
-                }
-                await Task.Delay(1000);
+                await Task.Delay(1000); // Short delay to allow lobby refresh
             }
         }
 
