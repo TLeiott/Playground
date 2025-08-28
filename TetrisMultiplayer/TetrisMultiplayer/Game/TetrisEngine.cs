@@ -11,7 +11,7 @@ namespace TetrisMultiplayer.Game
         public const int Height = 20;
         public int[,] Grid { get; } = new int[Height, Width];
         public Tetromino? Current { get; set; } // Nullable made explicit
-        public Tetromino Next { get; private set; }
+        public Tetromino Next { get; set; }
         public int Score { get; private set; }
         private Random _rng;
 
@@ -32,6 +32,18 @@ namespace TetrisMultiplayer.Game
                 Current.X = Width / 2 - 2;
                 Current.Y = 0;
             }
+        }
+
+        // For multiplayer: set the next piece externally (synchronized)
+        public void SetNextPiece(Tetromino nextPiece)
+        {
+            Next = nextPiece;
+        }
+
+        // For multiplayer: set the next piece by type (synchronized)
+        public void SetNextPiece(TetrominoType type)
+        {
+            Next = new Tetromino(type);
         }
 
         public Tetromino GenerateTetromino()

@@ -53,6 +53,16 @@ namespace TetrisMultiplayer.Game
             return _pieceSequence[_currentIndex];
         }
 
+        // For multiplayer: get the piece after the next one (for preview display)
+        public int PeekPreviewPiece()
+        {
+            if (_currentIndex + 1 >= _pieceSequence.Count)
+            {
+                GenerateInitialSequence(50);
+            }
+            return _pieceSequence[_currentIndex + 1];
+        }
+
         // For host: get full sequence so far
         public IReadOnlyList<int> PieceSequence => _pieceSequence.AsReadOnly();
 
