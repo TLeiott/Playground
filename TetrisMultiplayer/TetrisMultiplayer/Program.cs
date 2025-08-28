@@ -290,10 +290,12 @@ namespace TetrisMultiplayer
                             continue;
                         }
                         // StartGame und Seed an alle senden
+                        logger.LogInformation($"[Host] Broadcasting StartGame message with seed {seed} to {network.ConnectedPlayerIds.Count} clients");
                         var startGame = new { type = "StartGame", seed };
                         await network.BroadcastAsync(startGame);
                         
                         // Wait a moment for all clients to initialize their GameManagers
+                        logger.LogInformation("[Host] Waiting 2000ms for clients to process StartGame message");
                         await Task.Delay(2000);
                         
                         logger.LogInformation($"Spiel wird gestartet... (Seed: {seed})");
@@ -647,9 +649,21 @@ namespace TetrisMultiplayer
         {
             List<PlayerState> lastPlayers = new();
             bool gameStarted = false;
+            
+            GameLogger.LogDebug("[Client] Starting lobby loop, waiting for StartGame message");
+            
             while (!cancellationToken.IsCancellationRequested && !gameStarted)
             {
-                // Wait for any message: LobbyUpdate, StartGame, NextPiece
+                // Check if game started FIRST (GameManager set by StartGame message in NetworkManager)
+                if (network.GameManager != null && !gameStarted)
+                {
+                    GameLogger.LogDebug("[Client] GameManager detected, transitioning to game");
+                    gameStarted = true;
+                    await ClientGameLoop(network, cancellationToken, playerName);
+                    break;
+                }
+                
+                // Wait for lobby update messages (non-blocking)
                 var msg = await network.ReceiveLobbyUpdateAsync(cancellationToken);
                 if (msg != null)
                 {
@@ -662,15 +676,12 @@ namespace TetrisMultiplayer
                     {
                         Console.WriteLine($"  Name: {p.Name}, ID: {p.PlayerId}, HP: {p.Hp}");
                     }
+                    Console.WriteLine();
+                    Console.WriteLine("Warte auf Host zum Starten des Spiels...");
                 }
-                // Check if game started (GameManager set by StartGame message in NetworkManager)
-                if (network.GameManager != null && !gameStarted)
-                {
-                    gameStarted = true;
-                    await ClientGameLoop(network, cancellationToken, playerName);
-                    break;
-                }
-                await Task.Delay(200, cancellationToken);
+                
+                // Shorter delay for more responsive transition
+                await Task.Delay(100, cancellationToken);
             }
         }
 
