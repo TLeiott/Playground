@@ -158,14 +158,20 @@ namespace TetrisMultiplayer
             }
 
             // Ask for mode
-            Console.WriteLine("Bitte Modus wählen: host (h), client (c), test (t), oder validate (v):");
+            Console.WriteLine("Bitte Modus wählen: host (h), client (c), test (t), validate (v), oder single (s):");
             string? modeInput = Console.ReadLine();
             string mode = (modeInput ?? string.Empty).Trim().ToLower();
-            while (mode != "host" && mode != "h" && mode != "client" && mode != "c" && mode != "test" && mode != "t" && mode != "validate" && mode != "v")
+            while (mode != "host" && mode != "h" && mode != "client" && mode != "c" && mode != "test" && mode != "t" && mode != "validate" && mode != "v" && mode != "single" && mode != "s")
             {
-                Console.WriteLine("Ungültige Eingabe. Bitte 'host' (h), 'client' (c), 'test' (t) oder 'validate' (v) eingeben:");
+                Console.WriteLine("Ungültige Eingabe. Bitte 'host' (h), 'client' (c), 'test' (t), 'validate' (v) oder 'single' (s) eingeben:");
                 modeInput = Console.ReadLine();
-                mode = (modeInput ?? string.Empty).Trim().ToLower();
+                if (modeInput == null) 
+                {
+                    // Input stream ended, default to single player
+                    mode = "single";
+                    break;
+                }
+                mode = modeInput.Trim().ToLower();
             }
 
             if (mode == "host" || mode == "h")
@@ -187,10 +193,17 @@ namespace TetrisMultiplayer
             {
                 logger.LogInformation("Starte Validierungs-Modus...");
                 TetrisMultiplayer.Tests.PreviewValidationTest.ValidateOptimizations();
+                TetrisMultiplayer.Tests.ManualPreviewSyncTest.TestPreviewSynchronization();
+            }
+            else if (mode == "single" || mode == "s")
+            {
+                // Einzelspieler-Modus
+                logger.LogInformation("Starte Einzelspieler-Tetris...");
+                TetrisMultiplayer.UI.ConsoleUI.RunSinglePlayer();
             }
             else
             {
-                // Einzelspieler-Modus
+                // Default: Einzelspieler-Modus
                 logger.LogInformation("Starte Einzelspieler-Tetris...");
                 TetrisMultiplayer.UI.ConsoleUI.RunSinglePlayer();
             }
@@ -373,15 +386,19 @@ namespace TetrisMultiplayer
 
                     // CRITICAL: Get piece from centralized GameManager for synchronization
                     int pieceId = gameManager.GetNextPiece();
-                    var nextPiece = new { type = "NextPiece", pieceId, round = round };
+                    int previewPieceId = gameManager.PeekNextPiece(); // Get the next piece for preview
+                    var nextPiece = new { type = "NextPiece", pieceId, previewPieceId, round = round };
                     await network.BroadcastAsync(nextPiece);
-                    logger.LogInformation($"[Host] Runde {round}: Sende Piece {pieceId} an alle (Seed: {gameManager.Seed})");
+                    logger.LogInformation($"[Host] Runde {round}: Sende Piece {pieceId} mit Preview {previewPieceId} an alle (Seed: {gameManager.Seed})");
 
                     // Host-Zug - use the SAME piece ID as sent to clients
                     var hostEngine = fields[hostId];
                     hostEngine.Current = new TetrisMultiplayer.Game.Tetromino((TetrisMultiplayer.Game.TetrominoType)pieceId);
                     hostEngine.Current.X = TetrisMultiplayer.Game.TetrisEngine.Width / 2 - 2;
                     hostEngine.Current.Y = 0;
+                    
+                    // CRITICAL: Set the synchronized preview piece for host
+                    hostEngine.SetNextPiece((TetrisMultiplayer.Game.TetrominoType)previewPieceId);
                     
                     bool placed = false;
                     lastGravity = DateTime.Now;
@@ -810,13 +827,14 @@ namespace TetrisMultiplayer
                         if (nextOrGameOver.type == "NextPiece")
                         {
                             int? pieceId = nextOrGameOver.pieceId;
+                            int? previewPieceId = nextOrGameOver.previewPieceId;
                             if (pieceId == null) 
                             {
                                 GameLogger.LogError("[Client] ERROR: Received null pieceId");
                                 continue;
                             }
                             
-                            GameLogger.LogDebug($"[Client] Round {round}: Received piece {pieceId} from host");
+                            GameLogger.LogDebug($"[Client] Round {round}: Received piece {pieceId} with preview {previewPieceId} from host");
                             
                             // CRITICAL: Use the exact piece ID from host - this ensures synchronization
                             try
@@ -824,6 +842,12 @@ namespace TetrisMultiplayer
                                 engine.Current = new TetrisMultiplayer.Game.Tetromino((TetrisMultiplayer.Game.TetrominoType)pieceId.Value);
                                 engine.Current.X = TetrisMultiplayer.Game.TetrisEngine.Width / 2 - 2;
                                 engine.Current.Y = 0;
+                                
+                                // CRITICAL: Set the synchronized preview piece for client
+                                if (previewPieceId != null)
+                                {
+                                    engine.SetNextPiece((TetrisMultiplayer.Game.TetrominoType)previewPieceId.Value);
+                                }
                                 
                                 // Validate initial position
                                 if (!engine.IsValid(engine.Current, engine.Current.X, engine.Current.Y, engine.Current.Rotation))
