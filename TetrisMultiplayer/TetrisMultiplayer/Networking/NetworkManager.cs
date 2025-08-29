@@ -441,7 +441,15 @@ namespace TetrisMultiplayer.Networking
                             // Put back remaining messages
                             while (tempQueue.Count > 0)
                                 _clientMessageQueue.Enqueue(tempQueue.Dequeue());
-                return Task.FromResult<dynamic?>(new { type = "NextPiece", pieceId = queuedElement.GetProperty("pieceId").GetInt32() });
+                            
+                            var pieceId = queuedElement.GetProperty("pieceId").GetInt32();
+                            int? previewPieceId = null;
+                            if (queuedElement.TryGetProperty("previewPieceId", out var previewProp))
+                            {
+                                previewPieceId = previewProp.GetInt32();
+                            }
+                            
+                return Task.FromResult<dynamic?>(new { type = "NextPiece", pieceId, previewPieceId });
                         }
                         else if (qType == "GameOver")
                         {
@@ -732,7 +740,12 @@ namespace TetrisMultiplayer.Networking
                         if (element.TryGetProperty("seed", out var seedProp) && seedProp.TryGetInt32(out int seed))
                         {
                             _gameManager = new TetrisMultiplayer.Game.GameManager(seed);
-                            LogDebugToFile($"[Client] Game started with seed: {seed}");
+                            LogDebugToFile($"[Client] StartGame received and processed successfully with seed: {seed}");
+                            LogDebugToFile($"[Client] GameManager initialized: {_gameManager != null}");
+                        }
+                        else
+                        {
+                            LogDebugToFile("[Client] ERROR: StartGame message received but no valid seed found");
                         }
                         continue;
                     }
