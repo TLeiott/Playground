@@ -1,0 +1,197 @@
+#!/usr/bin/env bash
+# kf2-intel-dau.sh
+# DAU-freundliches, nicht-interaktives Setup für Killing Floor 2 (Intel HD 5500) unter Ubuntu/Debian.
+# Macht: i386-Architektur, Mesa/Vulkan 32/64bit libs, steam, protonup -> Proton-GE, Steam neu starten.
+# Log: ~/kf2-intel-dau.log
+set -euo pipefail
+LOG="$HOME/kf2-intel-dau.log"
+exec > >(tee -a "$LOG") 2>&1
+
+echo "=== KF2 Intel HD 5500 DAU-Setup START - $(date) ==="
+echo "Logfile: $LOG"
+echo
+
+# Helper: safe run apt-get non-interactive
+export DEBIAN_FRONTEND=noninteractive
+
+# 0) Prüfe sudo-Verfügbarkeit (wir brauchen sudo für Systempakete)
+if ! command -v sudo >/dev/null 2>&1; then
+  echo "FEHLER: sudo ist nicht installiert. Bitte installiere sudo oder führe das Script als root aus."
+  exit 1
+fi
+
+echo "[STEP 1] i386-Architektur & grundlegende Repos"
+sudo dpkg --add-architecture i386 || true
+sudo apt-get update -y || true
+# Ensure universe/multiverse for steam package availability
+sudo apt-get install -y software-properties-common apt-transport-https ca-certificates curl gnupg2 || true
+sudo add-apt-repository -y universe || true
+sudo add-apt-repository -y multiverse || true
+sudo apt-get update -y || true
+
+echo "[STEP 2] Installiere grundlegende Pakete (Steam, Vulkan/Mesa, Python3-pip)"
+# install as many likely-needed packages as possible
+sudo apt-get install -y --no-install-recommends \
+  steam \
+  python3-pip python3-venv \
+  mesa-utils \
+  mesa-vulkan-drivers \
+  vulkan-utils \
+  libvulkan1 libvulkan1:i386 \
+  libgl1-mesa-dri libgl1-mesa-dri:i386 libgl1-mesa-glx libgl1-mesa-glx:i386 \
+  libc6:i386 libstdc++6:i386 \
+  ca-certificates || true
+
+echo "[STEP 3] Optionales: Kisak-Mesa PPA (versucht, nicht fatal)"
+# Versuche Kisak PPA (aktualisierte Mesa) — wenn es fehlschlägt, ignorieren wir es.
+{
+  sudo add-apt-repository -y ppa:kisak/kisak-mesa
+  sudo apt-get update -y
+  sudo apt-get upgrade -y
+} || {
+  echo "Hinweis: Kisak PPA konnte nicht hinzugefügt werden oder ist nicht verfügbar. Weiter mit System-Mesa."
+}
+
+echo "[STEP 4] Prüfe Vulkan-Funktion (schnell)"
+if command -v vulkaninfo >/dev/null 2>&1; then
+  if vulkaninfo | head -n 1 >/dev/null 2>&1; then
+    echo "vulkaninfo OK. Erste Zeilen:"
+    vulkaninfo | sed -n '1,20p'
+  else
+    echo "vulkaninfo installiert, aber keine Vulkan-Instanz möglich. Das kann an fehlendem Intel Vulkan-ICD liegen."
+  fi
+else
+  echo "vulkaninfo nicht gefunden (vulkan-utils fehlt?) - das ist möglich, aber keine Blockade."
+fi
+
+echo "[STEP 5] Installiere protonup (versucht mehrere Fallback-Pfade) -- CLI wird benutzt"
+# pip user-install
+python3 -m pip install --user --upgrade pip setuptools wheel >/dev/null 2>&1 || true
+python3 -m pip install --user --upgrade protonup >/dev/null 2>&1 || true
+
+# Finde protonup-Executable
+POTENTIAL_PATHS=(
+  "$HOME/.local/bin/protonup"
+  "$HOME/.local/scripts/protonup"
+  "$HOME/.local/lib/python*/bin/protonup"
+  "/usr/local/bin/protonup"
+  "/usr/bin/protonup"
+)
+PROTONUP_BIN=""
+for p in "${POTENTIAL_PATHS[@]}"; do
+  # expand globs
+  for q in $(compgen -G "$p" 2>/dev/null || true); do
+    if [ -x "$q" ]; then
+      PROTONUP_BIN="$q"
+      break 2
+    fi
+  done
+done
+
+# Try python -m protonup as fallback
+if [ -z "$PROTONUP_BIN" ]; then
+  if python3 -c "import protonup,sys; print(getattr(protonup,'__file__',None))" >/dev/null 2>&1; then
+    # we can call python -m protonup
+    PROTONUP_CALL="python3 -m protonup"
+    echo "protonup als Python-Modul gefunden; werde 'python3 -m protonup' verwenden."
+  else
+    PROTONUP_CALL=""
+    echo "WARN: protonup nicht gefunden (pip --user Install evtl. fehlgeschlagen). Versuche pip system-wide..."
+    # Try system install (only if apt has python3-protonup? unlikely) - skip
+  fi
+else
+  PROTONUP_CALL="$PROTONUP_BIN"
+  echo "protonup gefunden: $PROTONUP_CALL"
+fi
+
+# If still empty, try installing protonup into a small venv and use it
+if [ -z "$PROTONUP_CALL" ]; then
+  echo "Erstelle temporäres venv, installiere protonup dort (Fallback)..."
+  TMPVENV="$HOME/.local/share/kf2-protonup-venv"
+  python3 -m venv "$TMPVENV" || { echo "VENV konnte nicht erstellt werden. Weiter ohne protonup."; }
+  if [ -f "$TMPVENV/bin/activate" ]; then
+    # activate and pip install
+    source "$TMPVENV/bin/activate"
+    pip install --upgrade pip >/dev/null 2>&1 || true
+    pip install protonup >/dev/null 2>&1 || true
+    if [ -x "$TMPVENV/bin/protonup" ]; then
+      PROTONUP_CALL="$TMPVENV/bin/protonup"
+      echo "protonup verfügbar via venv: $PROTONUP_CALL"
+    fi
+    deactivate || true
+  fi
+fi
+
+if [ -z "$PROTONUP_CALL" ]; then
+  echo "WARN: protonup konnte nicht installiert/gefunden werden. Wir fahren trotzdem mit System-Setup fort."
+else
+  echo "[STEP 6] Installiere Proton-GE (neueste) in gängige Steam-Compatibility-Ordner"
+  # Candidate compatibility dirs (cover different Steam layouts)
+  COMPAT_DIRS=(
+    "$HOME/.steam/root/compatibilitytools.d"
+    "$HOME/.steam/compatibilitytools.d"
+    "$HOME/.local/share/Steam/compatibilitytools.d"
+    "$HOME/.steam/steam/compatibilitytools.d"
+  )
+  CHOSEN_DIR=""
+  for d in "${COMPAT_DIRS[@]}"; do
+    mkdir -p "$d" || true
+    if [ -d "$d" ]; then
+      CHOSEN_DIR="$d"
+      break
+    fi
+  done
+  if [ -z "$CHOSEN_DIR" ]; then
+    echo "WARN: Kein Steam-compatibilitytools.d Ordner anlegbar. Proton-GE wird nicht installiert."
+  else
+    echo "Kompatibilitäts-Ordner: $CHOSEN_DIR"
+    # Run protonup to install latest GE (-t latest). If PROTONUP_CALL is a path or "python3 -m protonup"
+    echo "Starte protonup - dies kann einige Minuten dauern..."
+    set +e
+    if [[ "$PROTONUP_CALL" == python3* ]]; then
+      python3 -m protonup -d "$CHOSEN_DIR" -t latest
+      RC=$?
+    else
+      "$PROTONUP_CALL" -d "$CHOSEN_DIR" -t latest
+      RC=$?
+    fi
+    set -e
+    if [ $RC -ne 0 ]; then
+      echo "WARN: protonup meldete einen Fehler (RC=$RC). Möglicherweise keine Internetverbindung oder GitHub-Rate-Limit."
+    else
+      echo "Proton-GE wurde in $CHOSEN_DIR installiert/aktualisiert."
+    fi
+  fi
+fi
+
+echo "[STEP 7] Steam neu starten (falls läuft) und kurz Warten"
+# Try graceful close then restart
+killall steam || true
+sleep 2
+# Start steam, detach
+nohup steam >/dev/null 2>&1 &
+
+# Allow Steam ein wenig zu starten
+sleep 6
+
+echo
+echo "=== Fertig mit automatischem Setup. Was noch manuell (kurz) gemacht werden muss: ==="
+echo "1) Öffne Steam (falls nicht automatisch sichtbar)."
+echo "2) In der Library: Rechtsklick -> Eigenschaften -> Kompatibilität (Compatibility)"
+echo "   -> 'Force the use of a specific Steam Play compatibility tool' aktivieren."
+echo "   -> Wähle die soeben installierte Proton-GloriousEggroll / Proton-GE Version aus der Liste aus."
+echo "   -> Schließe Eigenschaften und starte 'Killing Floor 2'."
+echo
+echo "3) Wenn das Spiel immer noch sofort wieder schließt:"
+echo "   • Gehe in Eigenschaften -> Allgemein -> Startoptionen (Launch Options)"
+echo "   • Trage dort ein (genau):    PROTON_LOG=1 %command%"
+echo "   • Starte das Spiel. Warte bis es schließt. Dann sammle das Proton-Log:"
+echo "     ~/.steam/root/compatibilitytools.d/*/ (Proton-Logs befinden sich auch unter)"
+echo "     ~/.steam/steam/steamapps/compatdata/232090/pfx/ (-> Proton prefix logs)"
+echo
+echo "4) Logdatei dieses Setups: $LOG"
+echo
+echo "Falls du willst, kann ich dir jetzt erklären, wie du die relevanten Log-Zeilen findest und welche Teile du hier posten musst."
+echo "In vielen Fällen ist das Problem: fehlende 32-bit libs oder fehlender Vulkan-ICD für Intel HD 5500."
+echo
+echo "=== ENDE - $(date) ==="
